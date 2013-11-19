@@ -32,7 +32,7 @@ For this CL to function there should be a _toolspec_ named `fancy-tool` containi
 
 Again, an input parameter `input` and an output parameter `output` needs to be defined in the correspondent sections of `do-fancy-file-stuff`.
 
-**Don't use the character '_' (underscore) in toolspec, action or key names. It is allowed to use it in values within quotes.**
+**Don't use the character '_' (underscore) in toolspec, action or key names. It is permissible to use it in values within quotes.**
 
 #### File redirection and piping
 
