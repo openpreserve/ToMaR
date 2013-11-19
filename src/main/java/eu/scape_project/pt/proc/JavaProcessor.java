@@ -9,7 +9,7 @@ import org.apache.commons.logging.LogFactory;
 
 import eu.scape_project.pt.tool.Tool;
 //import eu.scape_project.pt.tools.fits.Fits;
-import edu.harvard.hul.ois.fits.Fits;
+//import edu.harvard.hul.ois.fits.Fits;
 
 public class JavaProcessor extends ToolProcessor{
 	
