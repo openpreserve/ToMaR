@@ -61,19 +61,7 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
-  	    <dependency>
-  	      <groupId>edu.harvard.hul.ois.fits</groupId>
-  	      <artifactId>Fits</artifactId>
-  	      <version>0.6.0</version>
-  	      <scope>provided</scope>
-  	   	</dependency>
-  	   	<dependency>
-		  <groupId>jdom</groupId>
-		  <artifactId>jdom</artifactId>
-		  <version>1.0</version>
-  	      <scope>provided</scope>
-		</dependency>
-		<dependency>
+ 		<dependency>
 		  <groupId>edu.harvard.hul.ois</groupId>
           <artifactId>Ots</artifactId>
           <version>0.6.0</version>
