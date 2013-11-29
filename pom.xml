@@ -1,40 +1,36 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<parent>
-		<artifactId>project-root</artifactId>
-		<groupId>eu.scape-project</groupId>
-		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
-  <artifactId>pt-mapred</artifactId>
-  <name>SCAPE MapReduce Wrappers</name>
-  <description>Invokes SCAPE preservation tools on Hadoop MapReduce environments</description>
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<mainClass>eu.scape_project.pt.mapred.CLIWrapper</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>eu.scape-project</groupId>
+    <artifactId>tomar</artifactId>
+    <name>SCAPE Tool-to-MapReduce Wrapper</name>
+    <description>Invokes SCAPE preservation tools on Hadoop MapReduce environments</description>
+    <version>0.0.1-SNAPSHOT</version>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>eu.scape_project.pt.mapred.CLIWrapper</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -44,39 +40,38 @@
                         <exclude>**/planets_project/**/*.java</exclude>
                     </excludes>
                 </configuration>
-             </plugin>
-		</plugins>
-	</build>
-  	<dependencies>  	
-	  	<dependency>
-	    	<groupId>net.sf.jopt-simple</groupId>
-	    	<artifactId>jopt-simple</artifactId>
-	    	<version>4.0-beta1</version>
-	  	</dependency> 
-	  	<dependency>
-    		<groupId>log4j</groupId>
-    		<artifactId>log4j</artifactId>
-    		<version>1.2.16</version>
+            </plugin>
+        </plugins>
+    </build>
+    <dependencies>  	
+        <dependency>
+            <groupId>net.sf.jopt-simple</groupId>
+            <artifactId>jopt-simple</artifactId>
+            <version>4.0-beta1</version>
+        </dependency> 
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.16</version>
         </dependency>
         <dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.0.1</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-  	   	<!--
-  	      dependency>
-  	      <groupId>eu.scape-project</groupId>
-  	      <artifactId>xa-pit</artifactId>
-  	      <version>${project.version}</version>
-  	   	</dependency
-  	   	-->
-  	   <dependency>
-  	      <groupId>org.apache.hadoop</groupId>
-  	      <artifactId>hadoop-core</artifactId>
-  	      <version>1.0.4</version>
-  	      <scope>provided</scope>
-  	   </dependency>
-  	</dependencies>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.0.1</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-core</artifactId>
+            <version>1.0.4</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 </project>
