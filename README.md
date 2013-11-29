@@ -1,4 +1,4 @@
-MapReduce Wrappers
+SCAPE Tool-to-MapReduce Wrapper
 ==================
 
 CLIWrapper
