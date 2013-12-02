@@ -1,10 +1,7 @@
 SCAPE Tool-to-MapReduce Wrapper (ToMaR)
 ======================================
 
-CLIWrapper
-----------
-
-CLIWrapper stands for "Command-Line-Interface"-Wrapper. It wraps _command lines_ for parallel execution in a MapReduce job. The wrapper only leverages the Mapper of the MapReduce-framework. Per map task the wrapper 
+ToMaR wraps _command lines_ for parallel execution in a MapReduce job. The wrapper only leverages the Mapper of the MapReduce-framework. Per map task the wrapper 
 
 * fetches the specified _toolspec_ from the _toolspec repository_
 * maps the _command line_ to the specified _action_ 
@@ -18,7 +15,7 @@ In order to avoid data-intensive duplications and temporary files streaming of d
 
 At least a command line (further: CL) consists of a pair of a _toolspec_ name and an _action_ of that toolspec. An _action_ denotes a specific shell command with placeholders for parameters, input and output files and further restrictions. 
 
-* See the [Toolspec XML Schema draft](https://github.com/openplanets/scape/blob/master/doc/WP.02.XA.Technical.Coordination/toolspec/tool-1.0_draft.xsd) and [example toolspecs](https://github.com/openplanets/scape/tree/master/pc-as/toolspecs) for deeper understanding of toolspecs
+* See the [Toolspec XML Schema draft](https://github.com/openplanets/scape-toolspecs/blob/master/toolspec.xsd) and [example toolspecs](https://github.com/openplanets/scape-toolspecs) for deeper understanding of toolspecs
 
 #### Basics
 
@@ -82,8 +79,8 @@ is described and demonstrated in this section. The input _command line_ files on
 #### Prerequisites
 
 1. Make sure the commands `file` and `ps2pdf` are in the path of your system. 
-2. Copy the toolspecs [file.xml](https://github.com/openplanets/tomar/src/test/resources/toolspecs/file.xml) and [ps2pdf.xml](https://github.com/openplanets/tomar/src/test/resources/toolspecs/ps2pdf.xml) to a directory of your choice on HDFS (eg. `/user/you/toolspecs/`).
-3. Copy [ps2pdf-input.ps](https://github.com/openplanets/tomar/src/test/resources/ps2pdf-input.ps) to a directory of your choice on HDFS (eg. `/user/you/input/`).
+2. Copy the toolspecs [file.xml](https://github.com/openplanets/tomar/tree/master/src/test/resources/toolspecs/file.xml) and [ps2pdf.xml](https://github.com/openplanets/tomar/tree/master/src/test/resources/toolspecs/ps2pdf.xml) to a directory of your choice on HDFS (eg. `/user/you/toolspecs/`).
+3. Copy [ps2pdf-input.ps](https://github.com/openplanets/tomar/tree/master/src/test/resources/ps2pdf-input.ps) to a directory of your choice on HDFS (eg. `/user/you/input/`).
 
 #### File identification 
 
