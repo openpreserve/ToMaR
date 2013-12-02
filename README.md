@@ -1,5 +1,5 @@
-SCAPE Tool-to-MapReduce Wrapper
-==================
+SCAPE Tool-to-MapReduce Wrapper (ToMaR)
+======================================
 
 CLIWrapper
 ----------
@@ -61,7 +61,7 @@ Having Hadoop set up you can run CLIWrapper:
         -o {output-dir-for-job} 
         -r {toolspec-repo-dir}
 
-* *path-to-jar* leads to the jar file of the SCAPE subproject _pt-mapred_ which has to be built with dependencies.
+* *path-to-jar* leads to the jar file of the SCAPE ToMaR which has to be built with dependencies.
 * *input-file-with-command-lines* functions like a batch file containing a list of commands line by line. 
 * *output-dir-for-job* is the directory on HDFS where output files will be written to.
 * *toolspec-repo-dir* is a directory on HDFS containing available toolspecs.
@@ -82,8 +82,8 @@ is described and demonstrated in this section. The input _command line_ files on
 #### Prerequisites
 
 1. Make sure the commands `file` and `ps2pdf` are in the path of your system. 
-2. Copy the toolspecs [file.xml](https://github.com/openplanets/scape/tree/master/pt-mapred/src/test/resources/toolspecs/file.xml) and [ps2pdf.xml](https://github.com/openplanets/scape/tree/master/pt-mapred/src/test/resources/toolspecs/ps2pdf.xml) to a directory of your choice on HDFS (eg. `/user/you/toolspecs/`).
-3. Copy [ps2pdf-input.ps](https://github.com/openplanets/scape/tree/master/pt-mapred/src/test/resources/ps2pdf-input.ps) to a directory of your choice on HDFS (eg. `/user/you/input/`).
+2. Copy the toolspecs [file.xml](https://github.com/openplanets/tomar/src/test/resources/toolspecs/file.xml) and [ps2pdf.xml](https://github.com/openplanets/tomar/src/test/resources/toolspecs/ps2pdf.xml) to a directory of your choice on HDFS (eg. `/user/you/toolspecs/`).
+3. Copy [ps2pdf-input.ps](https://github.com/openplanets/tomar/src/test/resources/ps2pdf-input.ps) to a directory of your choice on HDFS (eg. `/user/you/input/`).
 
 #### File identification 
 
