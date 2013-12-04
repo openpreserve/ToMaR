@@ -41,7 +41,8 @@ public class JavaProcessor extends ToolProcessor{
         securityManager(true);
         try {
         	LOG.debug("FITS_HOME: "+System.getenv("FITS_HOME"));
-        		Fits.main(args);
+        		//Fits.main(args);
+                        LOG.info("calling Java APIs not supported yet");
         } catch (ExitException ee) {
         	LOG.debug("Application tried to exit VM", ee);
         } catch(Exception e) {
