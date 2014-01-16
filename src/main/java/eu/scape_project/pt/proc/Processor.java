@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,8 +31,6 @@ public abstract class Processor implements Runnable {
      * Processor to read output from.
      */
     protected Processor prev;
-
-    protected boolean STOP = false;
 
     /**
      * Executes its process and provides the InputStream for the next processor.
@@ -81,13 +78,6 @@ public abstract class Processor implements Runnable {
     }
     
     /**
-     * Get previous processor
-     */
-    public Processor prev() {
-        return prev;
-    }
-
-    /**
      * Double-link this processor to given next processor
      */
     public void next(Processor nextProcessor) {
@@ -115,7 +105,7 @@ public abstract class Processor implements Runnable {
             LOG.debug(debugToken + " copy prev.stdout to stdin");
             LOG.debug("instance of stdout: " + this.prev.getStdOut().getClass().getName() );
             LOG.debug("instance of stdin: " + oStdIn.getClass().getName() );
-            IOUtils.copyLarge(this.prev.getStdOut(), oStdIn);
+            copyLarge(this.prev.getStdOut(), oStdIn);
             this.prev.getStdOut().close();
             oStdIn.close();
         } catch (IOException ex) {
@@ -126,4 +116,36 @@ public abstract class Processor implements Runnable {
 
     public abstract int waitFor() throws InterruptedException;
 
+    /**
+     * The default buffer size to use for 
+     * {@link #copyLarge(InputStream, OutputStream)}
+     */
+    private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
+    
+    /**
+     * Copy bytes from a large (over 2GB) <code>InputStream</code> to an
+     * <code>OutputStream</code>.
+     * <p>
+     * This method buffers the input internally, so there is no need to use a
+     * <code>BufferedInputStream</code>.
+     * 
+     * @param input  the <code>InputStream</code> to read from
+     * @param output  the <code>OutputStream</code> to write to
+     * @return the number of bytes copied
+     * @throws NullPointerException if the input or output is null
+     * @throws IOException if an I/O error occurs
+     * @since Commons IO 1.3
+     */
+    private static long copyLarge(InputStream input, OutputStream output)
+            throws IOException {
+        byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+        long count = 0;
+        int n = 0;
+        while (-1 != (n = input.read(buffer))) {
+            output.write(buffer, 0, n);
+            count += n;
+        }
+        return count;
+    }
+    
 }

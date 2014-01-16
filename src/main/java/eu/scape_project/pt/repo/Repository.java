@@ -1,7 +1,6 @@
 package eu.scape_project.pt.repo;
 
 /**
- *
  * @author Matthias Rella
  */
 public interface Repository {
@@ -12,11 +11,4 @@ public interface Repository {
      */
     public String[] getToolList();
 
-    /**
-     * Whether a toolspec exists in the repository.
-     * @param toolspec to look for
-     * @return true if the toolspec exists
-     */
-    public boolean toolspecExists(String toolspec);
-    
 }

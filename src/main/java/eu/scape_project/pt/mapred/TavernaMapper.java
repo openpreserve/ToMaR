@@ -14,7 +14,6 @@ import java.util.UUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import eu.scape_project.pt.proc.StreamProcessor;
 import eu.scape_project.pt.util.PropertyNames;
 import eu.scape_project.pt.util.fs.Filer;
 
@@ -36,9 +35,6 @@ public class TavernaMapper extends Mapper<LongWritable, Text, LongWritable, Text
 	private String tavernaHome;
 	private String workflowLocation;
 	private String resultOutDir;
-	
-	// File processor to get temporary input files
-	StreamProcessor fileProcessor;
 	
 	// Taverna output directory
 	private String tavernaOutput;

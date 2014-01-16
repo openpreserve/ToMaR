@@ -9,7 +9,6 @@ public class PropertyNames {
 
     public static final String INFILE = "INFILE";
     public static final String OUTDIR = "OUTDIR";
-    public static final String TOOLSTRING = "TOOLSTRING";
     public static final String ACTIONSTRING = "ACTIONSTRING";
     public static final String REPO_LOCATION = "REPO_LOCATION";
 

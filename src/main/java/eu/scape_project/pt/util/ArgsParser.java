@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Matthias Rella, DME-AIT
  */
 public class ArgsParser {
+    // TODO change so it is interchangeable with PipedArgsParser because it is less complex.
 
     private static Log LOG = LogFactory.getLog(ArgsParser.class);
 

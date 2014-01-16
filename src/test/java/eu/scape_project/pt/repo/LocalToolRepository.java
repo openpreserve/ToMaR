@@ -1,14 +1,17 @@
 package eu.scape_project.pt.repo;
 
 import eu.scape_project.pt.tool.Tool;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -18,6 +21,7 @@ import org.apache.commons.logging.LogFactory;
  * @author Matthias Rella, DME-AIT [myrho]
  */
 public class LocalToolRepository implements Repository {
+    
 	private static Log LOG = LogFactory.getLog(ToolRepository.class);
 	private static JAXBContext jc;
 	
@@ -25,8 +29,7 @@ public class LocalToolRepository implements Repository {
 		try {
 			jc  = JAXBContext.newInstance(Tool.class);
 		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+            throw new ExceptionInInitializerError(e);
 		}
 	}
 
@@ -41,17 +44,6 @@ public class LocalToolRepository implements Repository {
         if( !toolsDir.isDirectory() ) {
             throw new FileNotFoundException(toolsDir.toString());
         }
-    }
-
-    @Override
-    public String[] getToolList() {
-        return this.toolsDir.list();
-    }
-
-    @Override
-    public boolean toolspecExists(String file) {
-        return new File( this.toolsDir.getPath() + 
-                System.getProperty("file.separator") + file + ".xml").exists();
     }
 
     /**
@@ -70,6 +62,11 @@ public class LocalToolRepository implements Repository {
         return null;
     }
 
+    @Override
+    public String[] getToolList() {
+        return this.toolsDir.list();
+    }
+    
     /**
      * Unmarshals an input stream of xml data to a Tool.
      */

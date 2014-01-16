@@ -276,7 +276,7 @@ public class PipedArgsParser {
         return new SimpleEntry<String, String>(key, value);
     }
 
-    public Command COMMAND() throws IOException {
+    private Command COMMAND() throws IOException {
         Command c = new Command();
         if( nextToken() != StreamTokenizer.TT_WORD )
             throw new IOException("command must start with tool literal");

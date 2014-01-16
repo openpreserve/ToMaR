@@ -26,7 +26,7 @@ public class HDFSFiler extends Filer {
     /**
      * Hadoop Filesystem handle.
      */
-	protected FileSystem hdfs;
+	private final FileSystem hdfs;
 
     /**
      * File to handle by this filer
@@ -37,11 +37,6 @@ public class HDFSFiler extends Filer {
         this.file = new Path(value);
         hdfs = file.getFileSystem(new Configuration());
     }
-	
-	public boolean exists(String fileName) throws IOException {
-		Path path = new Path(fileName);
-		return hdfs.exists(path);
-	}
 	
     @Override
 	public File copyFile(String strSrc, String strDest) throws IOException {
