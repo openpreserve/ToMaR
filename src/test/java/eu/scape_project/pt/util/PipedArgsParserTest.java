@@ -15,47 +15,23 @@
  */
 package eu.scape_project.pt.util;
 
-import eu.scape_project.pt.util.PipedArgsParser.Command;
-import java.io.IOException;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import eu.scape_project.pt.util.PipedArgsParser.Command;
+
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.*;
+import org.junit.Test;
 
-/**
- *
- * @author ait
- */
 public class PipedArgsParserTest {
     
     private static Log LOG = LogFactory.getLog(PipedArgsParserTest.class);
-    public PipedArgsParserTest() {
-    }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of parse method, of class PipedArgsParser.
-     */
     @Test
     public void testParse() throws IOException {
         LOG.info("TEST parse");
@@ -77,7 +53,7 @@ public class PipedArgsParserTest {
             command1
         };
 
-        assertEquals(commandsExp, parser.getCommands());
+        assertArrayEquals(commandsExp, parser.getCommands());
 
         LOG.info("TEST good input");
         strCmdLine = "\"hdfs:///file.in\" > a-tool a-action --input1=\"bla\" --input3=\"5\" > \"file with spaces.out\"";
@@ -88,7 +64,7 @@ public class PipedArgsParserTest {
             put("input3", "5");
         }};
 
-        assertEquals(commandsExp, parser.getCommands());
+        assertArrayEquals(commandsExp, parser.getCommands());
         assertEquals("hdfs:///file.in", parser.getStdinFile() );
         assertEquals("file with spaces.out", parser.getStdoutFile() );
 
@@ -99,7 +75,7 @@ public class PipedArgsParserTest {
 
         assertEquals("file.in", parser.getStdinFile() );
         assertEquals(null, parser.getStdoutFile() );
-        assertEquals(commandsExp, parser.getCommands());
+        assertArrayEquals(commandsExp, parser.getCommands());
 
         LOG.info("TEST good input, stdout only");
         strCmdLine = "a-tool a-action --input1=\"bla\" --input3=\"5\" > file.out";
@@ -107,7 +83,7 @@ public class PipedArgsParserTest {
 
         assertEquals(null, parser.getStdinFile() );
         assertEquals("file.out", parser.getStdoutFile() );
-        assertEquals(commandsExp, parser.getCommands());
+        assertArrayEquals(commandsExp, parser.getCommands());
 
         LOG.info("TEST empty input");
         strCmdLine = "a-tool a-action --input1=\"bla\" --input3=\"\"";
@@ -118,7 +94,7 @@ public class PipedArgsParserTest {
             put("input3", "");
         }};
 
-        assertEquals(commandsExp, parser.getCommands());
+        assertArrayEquals(commandsExp, parser.getCommands());
 
         LOG.info("TEST good input without pairs");
         strCmdLine = "a-tool a-action";
@@ -126,7 +102,7 @@ public class PipedArgsParserTest {
 
         command1.pairs = new HashMap<String, String>();
 
-        assertEquals(commandsExp, parser.getCommands());
+        assertArrayEquals(commandsExp, parser.getCommands());
 
         LOG.info("TEST good input with quotes");
         strCmdLine = "a-tool a-action --input1=\"bla \\\"quoted\\\" bla\"";
@@ -135,7 +111,7 @@ public class PipedArgsParserTest {
         command1.pairs = new HashMap<String, String>() {{
             put("input1", "bla \"quoted\" bla");
         }};
-        assertEquals(commandsExp, parser.getCommands());
+        assertArrayEquals(commandsExp, parser.getCommands());
 
         LOG.info("TEST good input with pipes");
         strCmdLine = "a-tool a-action --input1=\"bla \\\"quoted\\\" bla\"";
@@ -152,7 +128,7 @@ public class PipedArgsParserTest {
         Command[] twoCommandsExp = {
             command1, command2
         };
-        assertEquals(twoCommandsExp, parser.getCommands());
+        assertArrayEquals(twoCommandsExp, parser.getCommands());
 
         LOG.info("TEST good input with more pipes");
         strCmdLine = "a-tool a-action --input1=\"bla \\\"quoted\\\" bla\"";
@@ -170,7 +146,7 @@ public class PipedArgsParserTest {
         Command[] moreCommandsExp = {
             command1, command2, command3
         };
-        assertEquals(moreCommandsExp, parser.getCommands());
+        assertArrayEquals(moreCommandsExp, parser.getCommands());
 
         LOG.info("TEST good input with more pipes and stdin/out");
         strCmdLine = "file.in > a-tool a-action --input1=\"bla \\\"quoted\\\" bla\"";
@@ -178,7 +154,7 @@ public class PipedArgsParserTest {
         strCmdLine += " | c-tool c-action --input3=\"bla\" > file.out";
         parser.parse(strCmdLine);
 
-        assertEquals(moreCommandsExp, parser.getCommands());
+        assertArrayEquals(moreCommandsExp, parser.getCommands());
         assertEquals("file.in", parser.getStdinFile());
         assertEquals("file.out", parser.getStdoutFile());
 
@@ -187,7 +163,7 @@ public class PipedArgsParserTest {
 
         try {
             parser.parse(strCmdLine);
-            assert false;
+            fail("no exception expected");
         }catch(IOException ex ) {
             LOG.info("expected exception: " + ex);
         }
@@ -197,7 +173,7 @@ public class PipedArgsParserTest {
 
         try {
             parser.parse(strCmdLine);
-            assert false;
+            fail("no exception expected");
         }catch(IOException ex ) {
             LOG.info("expected exception: " + ex);
         }
@@ -207,7 +183,7 @@ public class PipedArgsParserTest {
 
         try {
             parser.parse(strCmdLine);
-            assert false;
+            fail("no exception expected");
         }catch(IOException ex ) {
             LOG.info("expected exception: " + ex);
         }
@@ -217,7 +193,7 @@ public class PipedArgsParserTest {
 
         try {
             parser.parse(strCmdLine);
-            assert false;
+            fail("no exception expected");
         }catch(IOException ex ) {
             LOG.info("expected exception: " + ex);
         }
@@ -227,7 +203,7 @@ public class PipedArgsParserTest {
 
         try {
             parser.parse(strCmdLine);
-            assert false;
+            fail("no exception expected");
         }catch(IOException ex ) {
             LOG.info("expected exception: " + ex);
         }
@@ -237,7 +213,7 @@ public class PipedArgsParserTest {
 
         try {
             parser.parse(strCmdLine);
-            assert false;
+            fail("no exception expected");
         }catch(IOException ex ) {
             LOG.info("expected exception: " + ex);
         }
@@ -247,7 +223,7 @@ public class PipedArgsParserTest {
 
         try {
             parser.parse(strCmdLine);
-            assert false;
+            fail("no exception expected");
         }catch(IOException ex ) {
             LOG.info("expected exception: " + ex);
         }
@@ -257,7 +233,7 @@ public class PipedArgsParserTest {
 
         try {
             parser.parse(strCmdLine);
-            assert false;
+            fail("no exception expected");
         }catch(IOException ex ) {
             LOG.info("expected exception: " + ex);
         }
@@ -267,7 +243,7 @@ public class PipedArgsParserTest {
 
         try {
             parser.parse(strCmdLine);
-            assert false;
+            fail("no exception expected");
         }catch(IOException ex ) {
             LOG.info("expected exception: " + ex);
         }
@@ -277,7 +253,7 @@ public class PipedArgsParserTest {
 
         try {
             parser.parse(strCmdLine);
-            assert false;
+            fail("no exception expected");
         }catch(IOException ex ) {
             LOG.info("expected exception: " + ex);
         }

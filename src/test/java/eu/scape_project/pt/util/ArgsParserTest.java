@@ -15,46 +15,22 @@
  */
 package eu.scape_project.pt.util;
 
-import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.*;
+import org.junit.Test;
 
-/**
- *
- * @author ait
- */
 public class ArgsParserTest {
     
     private static Log LOG = LogFactory.getLog(ArgsParserTest.class);
-    public ArgsParserTest() {
-    }
 
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of parse method, of class ArgsParser.
-     */
     @Test
     public void testParse() throws IOException {
         LOG.info("TEST parse");
@@ -120,13 +96,6 @@ public class ArgsParserTest {
 
         assertEquals("file.in", parser.getStdinFile());
         assertEquals(null, parser.getStdoutFile());
-
     }
 
-    /**
-     * Test of setParameters method, of class ArgsParser.
-     */
-    @Test
-    public void testSetParameters() {
-    }
 }

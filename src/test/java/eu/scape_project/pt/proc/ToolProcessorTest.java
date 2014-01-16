@@ -17,65 +17,40 @@ package eu.scape_project.pt.proc;
 
 import eu.scape_project.pt.repo.LocalToolRepository;
 import eu.scape_project.pt.tool.Operation;
-import eu.scape_project.pt.tool.Operations;
 import eu.scape_project.pt.tool.Tool;
-import java.io.*;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.hadoop.conf.Configured;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.apache.hadoop.conf.Configured;
+import org.junit.Before;
+import org.junit.Test;
 
-/**
- *
- * @author ait
- */
 public class ToolProcessorTest extends Configured {
-    private LocalToolRepository repo;
-    private String toolspecsDir;
-    
     private static final Log LOG = LogFactory.getLog(ToolProcessorTest.class);
-
-    public ToolProcessorTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
     
+    private LocalToolRepository repo;
+
     @Before
-    public void setUp() {
-        try {
-            URL res = this.getClass().getClassLoader().getResource("toolspecs");
-            // use the file toolspec xml as the input file too (for this test)
-            toolspecsDir = res.getFile();
-            repo = new LocalToolRepository(res.getFile());
-
-        } catch (IOException ex) {
-            fail(ex.getMessage());
-        }
-
+    public void setUp() throws IOException {
+        URL res = this.getClass().getClassLoader().getResource("toolspecs");
+        // use the file toolspec xml as the input file too (for this test)
+        repo = new LocalToolRepository(res.getFile());
     }
     
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of execute method, of class ToolProcessor.
-     */
+    @Test
     public void testExecuteFileIdentify() throws Exception {
         Tool tool = repo.getTool("file");
 
-        String tmpInputFile = this.getClass().getClassLoader()
-                .getResource("ps2pdf-input.ps").getFile();
+        String tmpInputFile = this.getClass().getClassLoader().getResource("ps2pdf-input.ps").getFile();
 
         LOG.debug("tmpInputFile = " + tmpInputFile );
 
@@ -96,12 +71,13 @@ public class ToolProcessorTest extends Configured {
             processor.execute();
         } catch ( IOException ex ) {
             LOG.error(
-                "Exception during execution (maybe unresolved system dependency?): "
-                    + ex);
+                "Exception during execution (maybe unresolved system dependency?): ",
+                    ex);
         }
         LOG.info("output: " + new String(baos.toByteArray()) );
     }
 
+    @Test
     public void testExecuteFileIdentifyStdin() throws Exception {
 
         LOG.info("TEST file-identify-stdin");
@@ -112,8 +88,7 @@ public class ToolProcessorTest extends Configured {
 
         Tool tool = repo.getTool("file");
 
-        String tmpInputFile = this.getClass().getClassLoader()
-                .getResource("ps2pdf-input.ps").getFile();
+        String tmpInputFile = this.getClass().getClassLoader().getResource("ps2pdf-input.ps").getFile();
 
         ToolProcessor processor = new ToolProcessor(tool);
         Operation operation = processor.findOperation("identify-stdin");
@@ -131,21 +106,19 @@ public class ToolProcessorTest extends Configured {
             in.execute();
         } catch ( IOException ex ) {
             LOG.error(
-                "Exception during execution (maybe unresolved system dependency?): "
-                    + ex);
+                "Exception during execution (maybe unresolved system dependency?): ",
+                    ex);
         }
         LOG.info("output: " + new String(baos.toByteArray()) );
 
     }
 
+    @Test
     public void testExecutePs2pdfConvert() throws Exception {
-
-
         LOG.info("TEST ps2pdf-convert");
         Tool tool = repo.getTool("ps2pdf");
 
-        String tmpInputFile = this.getClass().getClassLoader()
-                .getResource("ps2pdf-input.ps").getFile();
+        String tmpInputFile = this.getClass().getClassLoader().getResource("ps2pdf-input.ps").getFile();
 
         ToolProcessor processor = new ToolProcessor(tool);
         Operation operation = processor.findOperation("convert");
@@ -172,14 +145,13 @@ public class ToolProcessorTest extends Configured {
             processor.execute();
         } catch ( IOException ex ) {
             LOG.error(
-                "Exception during execution (maybe unresolved system dependency?): "
-                    + ex);
+                "Exception during execution (maybe unresolved system dependency?): ",
+                    ex);
         }
-
     }
 
+    @Test
     public void testExecutePs2pdfConvertStreamed() throws Exception {
-
         LOG.info("TEST ps2pdf-convert-streamed");
         Tool tool = repo.getTool("ps2pdf");
 
@@ -207,8 +179,8 @@ public class ToolProcessorTest extends Configured {
             in.execute();
         } catch ( IOException ex ) {
             LOG.error(
-                "Exception during execution (maybe unresolved system dependency?): "
-                    + ex);
+                "Exception during execution (maybe unresolved system dependency?): ",
+                    ex);
         }
     }
 
