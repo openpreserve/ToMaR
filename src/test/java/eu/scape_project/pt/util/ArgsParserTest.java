@@ -34,7 +34,7 @@ public class ArgsParserTest {
     @Test
     public void testParse() throws IOException {
         LOG.info("TEST parse");
-        ArgsParser parser = new ArgsParser();
+        ArgsParser parser = new ArgsParser("tool", "action");
         Set<String> parameters = new HashSet<String>();
         parameters.add("input1");
         parameters.add("input3");

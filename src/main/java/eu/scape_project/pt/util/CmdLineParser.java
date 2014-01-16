@@ -28,20 +28,17 @@ public interface CmdLineParser {
     void parse(String strCmdLine) throws IOException;
 
     /**
-     * Gets recognized commands 
-     * @return Map mapArguments
+     * Gets recognized commands. 
      */
     Command[] getCommands();
 
     /**
-     * Gets recognized stdin file name
-     * @return String
+     * Gets recognized stdin file name.
      */
     String getStdinFile();
 
     /**
-     * Gets recognized stdout file name
-     * @return String
+     * Gets recognized stdout file name.
      */
     String getStdoutFile();
 

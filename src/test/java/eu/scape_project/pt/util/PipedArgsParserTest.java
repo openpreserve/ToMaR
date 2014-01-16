@@ -39,13 +39,10 @@ public class PipedArgsParserTest {
         String strCmdLine = "a-tool a-action --input-one=\"bla\" --input-two=\"5\"";
         parser.parse(strCmdLine);
 
-        Command command1 = new Command();
-        command1.action = "a-action";
-        command1.tool = "a-tool";
-        command1.pairs = new HashMap<String, String>() {{
+        Command command1 = new Command("a-tool", "a-action", new HashMap<String, String>() {{
             put("input-one", "bla");
             put("input-two", "5");
-        }};
+        }});
 
         Command[] commandsExp = {
             command1
@@ -57,11 +54,15 @@ public class PipedArgsParserTest {
         strCmdLine = "\"hdfs:///file.in\" > a-tool a-action --input1=\"bla\" --input3=\"5\" > \"file with spaces.out\"";
         parser.parse(strCmdLine);
 
-        command1.pairs = new HashMap<String, String>() {{
+        command1 = new Command("a-tool", "a-action", new HashMap<String, String>() {{
             put("input1", "bla");
             put("input3", "5");
-        }};
+        }});
 
+        commandsExp = new Command[] {
+            command1
+        };
+        
         assertArrayEquals(commandsExp, parser.getCommands());
         assertEquals("hdfs:///file.in", parser.getStdinFile() );
         assertEquals("file with spaces.out", parser.getStdoutFile() );
@@ -87,28 +88,41 @@ public class PipedArgsParserTest {
         strCmdLine = "a-tool a-action --input1=\"bla\" --input3=\"\"";
         parser.parse(strCmdLine);
 
-        command1.pairs = new HashMap<String, String>() {{
+        command1 = new Command("a-tool", "a-action", new HashMap<String, String>() {{
             put("input1", "bla");
             put("input3", "");
-        }};
+        }});
 
+        commandsExp = new Command[] {
+            command1
+        };
+        
         assertArrayEquals(commandsExp, parser.getCommands());
 
         LOG.info("TEST good input without pairs");
         strCmdLine = "a-tool a-action";
         parser.parse(strCmdLine);
 
-        command1.pairs = new HashMap<String, String>();
+        command1 = new Command("a-tool", "a-action");
 
+        commandsExp = new Command[] {
+            command1
+        };
+        
         assertArrayEquals(commandsExp, parser.getCommands());
 
         LOG.info("TEST good input with quotes");
         strCmdLine = "a-tool a-action --input1=\"bla \\\"quoted\\\" bla\"";
         parser.parse(strCmdLine);
 
-        command1.pairs = new HashMap<String, String>() {{
+        command1 = new Command("a-tool", "a-action", new HashMap<String, String>() {{
             put("input1", "bla \"quoted\" bla");
-        }};
+        }});
+
+        commandsExp = new Command[] {
+            command1
+        };
+
         assertArrayEquals(commandsExp, parser.getCommands());
 
         LOG.info("TEST good input with pipes");
@@ -116,12 +130,9 @@ public class PipedArgsParserTest {
         strCmdLine += " | b-tool b-action --input2=\"test\"";
         parser.parse(strCmdLine);
 
-        Command command2 = new Command();
-        command2.tool = "b-tool";
-        command2.action = "b-action";
-        command2.pairs = new HashMap<String, String>() {{
+        Command command2 = new Command("b-tool", "b-action", new HashMap<String, String>() {{
             put("input2", "test");
-        }};
+        }});
 
         Command[] twoCommandsExp = {
             command1, command2
@@ -134,12 +145,9 @@ public class PipedArgsParserTest {
         strCmdLine += " | c-tool c-action --input3=\"bla\"";
         parser.parse(strCmdLine);
 
-        Command command3 = new Command();
-        command3.tool = "c-tool";
-        command3.action = "c-action";
-        command3.pairs = new HashMap<String, String>() {{
+        Command command3 = new Command("c-tool", "c-action", new HashMap<String, String>() {{
             put("input3", "bla");
-        }};
+        }});
 
         Command[] moreCommandsExp = {
             command1, command2, command3

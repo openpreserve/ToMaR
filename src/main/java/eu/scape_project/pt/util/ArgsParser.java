@@ -31,11 +31,13 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Matthias Rella, DME-AIT
  */
-public class ArgsParser {
-    // TODO extends CmdLineParser - so it is interchangeable with PipedArgsParser because it is less complex.
+public class ArgsParser implements CmdLineParser {
 
     private static Log LOG = LogFactory.getLog(ArgsParser.class);
 
+    private final String tool;
+    private final String action;
+    
     /**
      * Set of parameters which are recognized by this parser.
      * If null or empty parser accepts all parameters
@@ -62,14 +64,19 @@ public class ArgsParser {
      */
     private String strStdoutFile = "";
 
+    public ArgsParser(String tool, String action) {
+        this.tool = tool;
+        this.action = action;
+    }
+
     /**
      * Public interface for parsing a command line. The form of the
      * command line should be (--key="value")* (&lt stdinfile)? (&gt stdoutfile)?.
      * Results can be fetched via getters.
      * @param strCmdLine input String
      */
+    @Override
     public void parse(String strCmdLine) throws IOException {
-
         mapArguments = new HashMap<String, String>();
         strStdinFile = "";
         strStdoutFile = "";
@@ -168,7 +175,6 @@ public class ArgsParser {
 
     /**
      * Gets recognized arguments (key-value pairs)
-     * @return Map mapArguments
      */
     public Map<String, String> getArguments() {
         return this.mapArguments;
@@ -176,18 +182,23 @@ public class ArgsParser {
 
     /**
      * Gets recognized stdin file name
-     * @return String
      */
+    @Override
     public String getStdinFile() {
         return this.strStdinFile == "" ? null : this.strStdinFile;
     }
 
     /**
      * Gets recognized stdout file name
-     * @return String
      */
+    @Override
     public String getStdoutFile() {
         return this.strStdoutFile == "" ? null : this.strStdoutFile;
+    }
+
+    @Override
+    public Command[] getCommands() {
+        return new Command[] { new Command(tool, action, mapArguments) };
     }
 
 }

@@ -95,20 +95,20 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
             for(int c = 0; c < commands.length; c++ ) {
                 Command command = commands[c];
 
-                this.tool = repo.getTool(command.tool);
+                this.tool = repo.getTool(command.getTool());
 
                 lastProcessor = new ToolProcessor(this.tool);
 
-                this.operation = lastProcessor.findOperation(command.action);
+                this.operation = lastProcessor.findOperation(command.getAction());
                 if( this.operation == null )
                     throw new IOException(
-                            "operation " + command.action + " not found");
+                            "operation " + command.getAction() + " not found");
 
                 lastProcessor.setOperation(this.operation);
 
                 lastProcessor.initialize();
 
-                lastProcessor.setParameters(command.pairs);
+                lastProcessor.setParameters(command.getPairs());
 
                 // get parameters accepted by the lastProcessor.
                 mapInputFileParameters[c] = lastProcessor.getInputFileParameters(); 

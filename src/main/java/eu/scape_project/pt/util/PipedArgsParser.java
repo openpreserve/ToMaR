@@ -210,14 +210,13 @@ public class PipedArgsParser implements CmdLineParser {
     private Varbox R2( String tool ) throws IOException {
         if( nextToken() != '"' && currentToken() != StreamTokenizer.TT_WORD) 
             throw new IOException("an action name must follow after tool");
-        Command c = new Command();
-        c.action = tokenizer.sval;
-        c.tool = tool;
+        String action = tokenizer.sval;
+        Command c = new Command(tool, action);
         Varbox r = new Varbox();
         nextToken();
         while( currentToken() == '-' ) {
             Entry<String, String> pair = PAIR();
-            c.pairs.put( pair.getKey(), pair.getValue() );
+            c.addPair( pair.getKey(), pair.getValue() );
             nextToken();
         }
         r.commands.add(c);
@@ -260,16 +259,18 @@ public class PipedArgsParser implements CmdLineParser {
     }
 
     private Command COMMAND() throws IOException {
-        Command c = new Command();
-        if( nextToken() != StreamTokenizer.TT_WORD )
+        if( nextToken() != StreamTokenizer.TT_WORD ) {
             throw new IOException("command must start with tool literal");
-        c.tool = tokenizer.sval;
-        if( nextToken() != StreamTokenizer.TT_WORD )
+        }
+        String tool = tokenizer.sval;
+        if( nextToken() != StreamTokenizer.TT_WORD ) {
             throw new IOException("second argument of command must be an action literal");
-        c.action = tokenizer.sval;
+        }
+        String action = tokenizer.sval;
+        Command c = new Command(tool, action);
         while( nextToken() == '-' ) {
             Entry<String, String> pair = PAIR();
-            c.pairs.put( pair.getKey(), pair.getValue() );
+            c.addPair( pair.getKey(), pair.getValue() );
         }
         return c;
     }

@@ -20,10 +20,36 @@ import java.util.Map;
 
 public class Command {
     
-    public String tool = "";
-    public String action = "";
-    public Map<String, String> pairs = new HashMap<String, String>();
+    private final String tool;
+    private final String action;
+    private final Map<String, String> pairs;
 
+    public Command(String tool, String action) {
+        this(tool, action, new HashMap<String, String>());
+    }
+
+    public Command(String tool, String action, Map<String, String> pairs) {
+        this.tool = tool;
+        this.action = action;
+        this.pairs = pairs;
+    }
+
+    public void addPair(String key, String value) {
+        pairs.put(key, value);
+    }
+
+    public String getTool() {
+        return tool;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public Map<String, String> getPairs() {
+        return pairs;
+    }
+    
     @Override
     public boolean equals( Object oo ) {
         Command o = (Command)oo;
@@ -35,4 +61,5 @@ public class Command {
     public int hashCode() {
         return this.tool.hashCode() ^ this.action.hashCode() ^ this.pairs.hashCode();
     }
+
 }
