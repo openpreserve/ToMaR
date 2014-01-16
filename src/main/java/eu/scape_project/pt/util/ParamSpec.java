@@ -14,7 +14,7 @@ public class ParamSpec {
     }
 
     private boolean required;
-    private Class type;
+    private Class<?> type;
     private int direction;
 
     public boolean isRequired() {
@@ -25,11 +25,11 @@ public class ParamSpec {
         this.required = required;
     }
 
-    public Class getType() {
+    public Class<?> getType() {
         return type;
     }
 
-    public void setType(Class type) {
+    public void setType(Class<?> type) {
         this.type = type;
     }
 

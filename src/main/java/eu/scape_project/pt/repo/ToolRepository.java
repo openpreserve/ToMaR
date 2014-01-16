@@ -1,26 +1,22 @@
 package eu.scape_project.pt.repo;
 
-import java.io.File;
-import java.io.FileInputStream;
+import eu.scape_project.pt.tool.Tool;
+
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import eu.scape_project.pt.tool.Tool;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -48,10 +44,6 @@ public class ToolRepository implements Repository{
 
     /**
      * Constructs the repository from a given HDFSystem and a directory path.
-     * @param fs
-     * @param directory
-     * @throws FileNotFoundException
-     * @throws IOException 
      */
     public ToolRepository( FileSystem fs, Path directory ) 
             throws FileNotFoundException, IOException {
@@ -82,8 +74,6 @@ public class ToolRepository implements Repository{
      * Gets a certain Tool from the repository.
      * 
      * @param strTool name of the tool to get
-     * @return
-     * @throws FileNotFoundException 
      */
     public Tool getTool( String strTool ) throws IOException {
         Path file = new Path( 
@@ -115,8 +105,6 @@ public class ToolRepository implements Repository{
 
     /**
      * Gets the file name of given tool name.
-     * @param strTool
-     * @return 
      */
     private String getToolName( String strTool ) {
         return strTool + ".xml";
@@ -124,9 +112,6 @@ public class ToolRepository implements Repository{
 
     /**
      * Unmarshals an input stream of xml data to a Tool.
-     * @param input
-     * @return
-     * @throws JAXBException 
      */
     private Tool fromInputStream(InputStream input) throws JAXBException {
 		Unmarshaller u = jc.createUnmarshaller();
@@ -135,9 +120,6 @@ public class ToolRepository implements Repository{
 
     /**
      * Who needs this method?
-     * @return
-     * @throws JAXBException
-     * @throws UnsupportedEncodingException 
      */
 	private String toXMlFormatted() throws JAXBException, UnsupportedEncodingException {
 		//Create marshaller
@@ -148,6 +130,5 @@ public class ToolRepository implements Repository{
 		m.marshal(this, bos);
 		return bos.toString("UTF-8");
 	}
-	
 
 }

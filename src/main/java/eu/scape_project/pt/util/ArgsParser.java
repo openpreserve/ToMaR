@@ -18,9 +18,11 @@ package eu.scape_project.pt.util;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -63,8 +65,7 @@ public class ArgsParser {
      * Public interface for parsing a command line. The form of the
      * command line should be (--key="value")* (&lt stdinfile)? (&gt stdoutfile)?.
      * Results can be fetched via getters.
-     * @param String strCmdLine input String
-     * @throws IOException 
+     * @param strCmdLine input String
      */
     public void parse(String strCmdLine) throws IOException {
 
@@ -79,8 +80,6 @@ public class ArgsParser {
 
     /**
      * Reads next token from Tokenizer and increases column number
-     * @return
-     * @throws IOException 
      */
     private int nextToken() throws IOException {
         //colnr += tokenizer.sval != null ? tokenizer.sval.length() : 1;
@@ -91,8 +90,6 @@ public class ArgsParser {
 
     /**
      * Matches (--key="value")* (< stdin)? (> stdout)?
-     *
-     * @throws IOException
      */
     private void root() throws IOException {
         while (nextToken() == '-') {
@@ -109,8 +106,6 @@ public class ArgsParser {
 
     /**
      * Matches -key="value"
-     *
-     * @throws IOException
      */
     private void pair() throws IOException {
         String key = null;
@@ -135,8 +130,7 @@ public class ArgsParser {
                     mapArguments.put(key, value);
                     return;
                 }
-                else
-                    LOG.error("unrecognized token, expecting '\"'");
+                LOG.error("unrecognized token, expecting '\"'");
             }
             else
                 LOG.error("unrecognized token, expecting '='");
@@ -148,7 +142,6 @@ public class ArgsParser {
 
     /**
      * Matches a string (quoted or not)
-     * @throws IOException 
      */
     private void stdin() throws IOException {
         LOG.debug("stdin");
@@ -158,7 +151,6 @@ public class ArgsParser {
 
     /**
      * Matches a string (quoted or not)
-     * @throws IOException 
      */
     private void stdout() throws IOException {
         LOG.debug("stdout");
@@ -168,7 +160,6 @@ public class ArgsParser {
 
     /**
      * Sets parameters (keys) to be recognized by parser.
-     * @param parameters 
      */
     public void setParameters(Set<String> parameters) {
         this.setParameters = parameters;

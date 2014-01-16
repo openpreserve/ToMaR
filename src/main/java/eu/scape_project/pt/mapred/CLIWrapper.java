@@ -37,10 +37,6 @@ public class CLIWrapper extends Configured implements org.apache.hadoop.util.Too
 	
     /**
      * Sets up, initializes and starts the Job.
-     * 
-     * @param args
-     * @return
-     * @throws Exception
      */
     @Override
     public int run(String[] args) throws Exception {
@@ -81,11 +77,8 @@ public class CLIWrapper extends Configured implements org.apache.hadoop.util.Too
 	
     /**
      * CLIWrapper user interface. See printUsage for further information.
-     * 
-     * @param args
-     * @throws Exception 
      */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		
 		int res = 1;
 		CLIWrapper mr = new CLIWrapper();

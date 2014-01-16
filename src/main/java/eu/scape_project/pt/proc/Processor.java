@@ -3,6 +3,7 @@ package eu.scape_project.pt.proc;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 public abstract class Processor implements Runnable {
 
     private static Log LOG = LogFactory.getLog(ToolProcessor.class);
+    
     protected char debugToken = 'P';
     /**
      * Inputstream to read from. 
@@ -36,11 +38,10 @@ public abstract class Processor implements Runnable {
     /**
      * Executes its process and provides the InputStream for the next processor.
      * @return exit code of process (0 for success)
-     * @throws Exception 
      */
-	abstract public int execute() throws Exception;
+	public abstract int execute() throws Exception;
 	
-	abstract public void initialize();
+	public abstract void initialize();
 
     /**
      * Gets standard output stream of processor
@@ -60,7 +61,6 @@ public abstract class Processor implements Runnable {
 
     /**
      * Sets standard output stream of processor
-     * @param InputStream out 
      */
     public void setStdOut(InputStream out) {
         this.iStdOut = out;
@@ -68,7 +68,6 @@ public abstract class Processor implements Runnable {
 
     /**
      * Sets standard input stream of processor
-     * @param OutputStream in 
      */
     public void setStdIn(OutputStream in) {
         this.oStdIn = in;
@@ -76,7 +75,6 @@ public abstract class Processor implements Runnable {
 
     /**
      * Get next processor
-     * @return 
      */
     public Processor next() {
         return next;
@@ -84,7 +82,6 @@ public abstract class Processor implements Runnable {
     
     /**
      * Get previous processor
-     * @return 
      */
     public Processor prev() {
         return prev;
@@ -92,22 +89,20 @@ public abstract class Processor implements Runnable {
 
     /**
      * Double-link this processor to given next processor
-     * @param next 
      */
-    public void next(Processor next) {
-        if( this.next == next ) return;
-        this.next = next;
-        next.prev(this);
+    public void next(Processor nextProcessor) {
+        if( this.next == nextProcessor ) return;
+        this.next = nextProcessor;
+        nextProcessor.prev(this);
     }
 
     /**
      * Double-link this processor to given previous processor
-     * @param prev 
      */
-    private void prev(Processor prev) {
-        if( this.prev == prev ) return;
-        this.prev = prev;
-        prev.next(this);
+    private void prev(Processor prevProcessor) {
+        if( this.prev == prevProcessor ) return;
+        this.prev = prevProcessor;
+        prevProcessor.next(this);
     }
 
     @Override
@@ -129,9 +124,6 @@ public abstract class Processor implements Runnable {
         }
     }
 
-
-    abstract public int waitFor() throws InterruptedException;
-    
-
+    public abstract int waitFor() throws InterruptedException;
 
 }

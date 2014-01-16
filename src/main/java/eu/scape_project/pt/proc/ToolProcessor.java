@@ -1,12 +1,18 @@
 package eu.scape_project.pt.proc;
 
-import eu.scape_project.pt.repo.ToolRepository;
-import eu.scape_project.pt.tool.*;
+import eu.scape_project.pt.tool.Input;
+import eu.scape_project.pt.tool.Operation;
+import eu.scape_project.pt.tool.Operations;
+import eu.scape_project.pt.tool.Output;
+import eu.scape_project.pt.tool.Parameter;
+import eu.scape_project.pt.tool.Tool;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -28,11 +34,6 @@ public class ToolProcessor extends Processor {
      * Tool to use.
      */
     private Tool tool;
-
-    /**
-     * ToolRepository to fetch tools from.
-     */
-    private ToolRepository repo;
 
     /**
      * Parameters referring to input files.
@@ -57,9 +58,6 @@ public class ToolProcessor extends Processor {
     /**
      * Constructs the processor with a tool and an action of a
      * toolspec.
-     *
-     * @param Tool tool
-     * @param Operation operation
      */
     public ToolProcessor(Tool tool) {
         this.tool = tool;
@@ -69,8 +67,7 @@ public class ToolProcessor extends Processor {
     /**
      * Tries to find a operation of the tool.
      * 
-     * @param Operation strOp
-     * @return 
+     * @param strOp Operation 
      */
     public Operation findOperation( String strOp ) {
         LOG.debug("findOperation(" + strOp + ")");
@@ -86,8 +83,6 @@ public class ToolProcessor extends Processor {
 
     /**
      * Sets the operation to use for execution. 
-     * 
-     * @param op 
      */
     public void setOperation( Operation op ) {
         this.operation = op;
@@ -96,9 +91,6 @@ public class ToolProcessor extends Processor {
     /**
      * Executes the tool, optionally reading from a previous process (stdin).
      * All input file parameters need to be local to the machine.
-     * 
-     * @return
-     * @throws Exception 
      */
     @Override
     public int execute() throws Exception {
@@ -132,9 +124,6 @@ public class ToolProcessor extends Processor {
 
     /** 
      * Waits for the sub-process to terminate.
-     * 
-     * @return
-     * @throws InterruptedException 
      */
     @Override
     public int waitFor() throws InterruptedException {
@@ -149,8 +138,6 @@ public class ToolProcessor extends Processor {
 
     /**
      * Fills all types of parameters with given Map of parameters.
-     * 
-     * @param mapParams 
      */
     public void setParameters( Map<String, String> mapParams) {
         for(Entry<String, String> entry: mapParams.entrySet() ) 
@@ -164,8 +151,6 @@ public class ToolProcessor extends Processor {
 
     /**
      * Get input file parameters from the toolspec.
-     * 
-     * @return 
      */
     public Map<String, String> getInputFileParameters() {
         LOG.debug("getInputFileParameters");
@@ -185,8 +170,6 @@ public class ToolProcessor extends Processor {
 
     /**
      * Get output file parameters from the toolspec.
-     * 
-     * @return 
      */
     public Map<String, String> getOutputFileParameters() {
         LOG.debug("getOutputFileParameters");
@@ -201,13 +184,10 @@ public class ToolProcessor extends Processor {
             }
         }
         return this.mapOutputFileParameters = parameters;
-
     }
 
     /**
      * Gets other input parameters from the toolspec.
-     * 
-     * @return 
      */
     public Map<String, String> getOtherParameters() {
         if( this.mapOtherParameters != null )
@@ -226,7 +206,7 @@ public class ToolProcessor extends Processor {
     /**
      * Sets input file parameters.
      * 
-     * @param mapTempInputFileParameters 
+     * @param mapInput mapTempInputFileParameters 
      */
     public void setInputFileParameters(Map<String, String> mapInput) {
         this.mapInputFileParameters = mapInput;
@@ -234,8 +214,6 @@ public class ToolProcessor extends Processor {
 
     /**
      * Sets output file parameters.
-     * 
-     * @param mapTempInputFileParameters 
      */
     public void setOutputFileParameters(Map<String, String> mapOutput) {
         this.mapOutputFileParameters = mapOutput;
@@ -243,9 +221,6 @@ public class ToolProcessor extends Processor {
 
     /**
      * Replaces ${key}s in given command strCmd by values.
-     * 
-     * @param strCmd
-     * @param mapInputs 
      */
 	 private String replaceAll(String strCmd, Map<String,String> mapInputs) {
          if( mapInputs.isEmpty() ) return strCmd;
@@ -274,9 +249,6 @@ public class ToolProcessor extends Processor {
     /**
      * Maps a parameter name to the placeholder's form.
      * Inverse of placeholderToParameter.
-     * 
-     * @param strParameter
-     * @return 
      */
     private String parameterToPlaceholder( String strParameter ) {
         return "\\$\\{" + strParameter + "\\}|"; 
@@ -285,9 +257,6 @@ public class ToolProcessor extends Processor {
     /**
      * Maps a placeholder to its parameter name.
      * Inverse of parameterToPlaceholder.
-     * 
-     * @param strVariable
-     * @return 
      */
     private String placeholderToParameter( String strVariable ) {
         return strVariable.substring(2, strVariable.length() - 1 );

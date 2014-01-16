@@ -1,17 +1,24 @@
 package eu.scape_project.pt.mapred;
 
-import eu.scape_project.pt.util.fs.Filer;
 import eu.scape_project.pt.proc.Processor;
 import eu.scape_project.pt.proc.StreamProcessor;
 import eu.scape_project.pt.proc.ToolProcessor;
 import eu.scape_project.pt.repo.ToolRepository;
 import eu.scape_project.pt.tool.Operation;
 import eu.scape_project.pt.tool.Tool;
-import eu.scape_project.pt.util.*;
+import eu.scape_project.pt.util.PipedArgsParser;
 import eu.scape_project.pt.util.PipedArgsParser.Command;
-import java.io.*;
-import java.util.*;
+import eu.scape_project.pt.util.PropertyNames;
+import eu.scape_project.pt.util.fs.Filer;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -20,14 +27,12 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Mapper.Context;
 
 /**
  * The Toolspec executor.
  *
  * @author Rainer Schmidt [rschmidt13]
  * @author Matthias Rella [myrho]
- *
  */
 public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Text> {
 

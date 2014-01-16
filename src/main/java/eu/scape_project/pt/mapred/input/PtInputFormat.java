@@ -1,7 +1,5 @@
 package eu.scape_project.pt.mapred.input;
 
-import java.io.IOException;
-
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
@@ -13,8 +11,7 @@ public class PtInputFormat extends FileInputFormat<LongWritable, Text> {
 
     @Override
     public RecordReader<LongWritable, Text> createRecordReader(InputSplit split,
-            TaskAttemptContext context) throws IOException, InterruptedException {
-        // TODO Auto-generated method stub
+            TaskAttemptContext context) {
         return new PtRecordReader();
     }
 }

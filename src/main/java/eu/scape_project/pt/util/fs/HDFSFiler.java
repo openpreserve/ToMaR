@@ -19,14 +19,14 @@ import org.apache.hadoop.fs.Path;
  * @author Matthias Rella [myrho]
  * @author Martin Schenck [schenck]
  */
-public class HDFSFiler extends Filer{
+public class HDFSFiler extends Filer {
 	
 	private static Log LOG = LogFactory.getLog(HDFSFiler.class);
 	
     /**
      * Hadoop Filesystem handle.
      */
-	protected FileSystem hdfs = null;
+	protected FileSystem hdfs;
 
     /**
      * File to handle by this filer
@@ -38,8 +38,8 @@ public class HDFSFiler extends Filer{
         hdfs = file.getFileSystem(new Configuration());
     }
 	
-	public boolean exists(String file) throws IOException {
-		Path path = new Path(file);
+	public boolean exists(String fileName) throws IOException {
+		Path path = new Path(fileName);
 		return hdfs.exists(path);
 	}
 	
@@ -55,8 +55,8 @@ public class HDFSFiler extends Filer{
 	
 	@Override
 	public void depositDirectoryOrFile(String strSrc, String strDest) throws IOException {
-        File file = new File( strSrc );
-		if(file.isDirectory()) {
+        File source = new File( strSrc );
+		if(source.isDirectory()) {
 			depositDirectory(strSrc, strDest);
 		} else {
 			depositFile(strSrc, strDest);
@@ -66,17 +66,17 @@ public class HDFSFiler extends Filer{
 	@Override
 	public void depositDirectory(String strSrc, String strDest) throws IOException {
 		// Get output directory name from strSrc
-        File dir = new File( strSrc );
+        File localDir = new File( strSrc );
 		
-		if(!dir.isDirectory()) {
-			throw new IOException("Could not find correct local output directory: " + dir );
+		if(!localDir.isDirectory()) {
+			throw new IOException("Could not find correct local output directory: " + localDir );
 		}
 		
-		LOG.info("Local directory is: " + dir );
+		LOG.info("Local directory is: " + localDir );
 		
         // FIXME if strSrc is a directory then strDest should be a directory too
-		for(File file : dir.listFiles()) {
-			depositDirectoryOrFile(file.getCanonicalPath(), strDest + File.separator + file.getName());
+		for(File localFile : localDir.listFiles()) {
+			depositDirectoryOrFile(localFile.getCanonicalPath(), strDest + File.separator + localFile.getName());
 		}
 	}
 
@@ -102,9 +102,9 @@ public class HDFSFiler extends Filer{
     }
 
     @Override
-    public void setDirectory(String strDir ) throws IOException {
-        File dir = new File(getTmpDir() + strDir );
-        dir.mkdir();
+    public void setDirectory(String strDir ) {
+        File tempDir = new File(getTmpDir() + strDir );
+        tempDir.mkdir();
         this.dir = strDir;
     }
 

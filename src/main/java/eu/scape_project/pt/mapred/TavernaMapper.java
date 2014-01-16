@@ -6,22 +6,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.io.Text;
 
-import eu.scape_project.pt.util.fs.Filer;
 import eu.scape_project.pt.proc.StreamProcessor;
 import eu.scape_project.pt.util.PropertyNames;
-import java.util.*;
+import eu.scape_project.pt.util.fs.Filer;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Mapper.Context;
 
 /**
  * Executes a Taverna workflow using the Taverna shell script from the installation.

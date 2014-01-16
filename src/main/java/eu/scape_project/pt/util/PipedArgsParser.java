@@ -18,11 +18,12 @@ package eu.scape_project.pt.util;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Vector;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -59,8 +60,7 @@ public class PipedArgsParser {
      * Public interface for parsing a command line. The form of the
      * command line should be (--key="value")* (&lt stdinfile)? (&gt stdoutfile)?.
      * Results can be fetched via getters.
-     * @param String strCmdLine input String
-     * @throws IOException 
+     * @param strCmdLine input String
      */
     public void parse(String strCmdLine) throws IOException {
 
@@ -79,8 +79,6 @@ public class PipedArgsParser {
 
     /**
      * Reads next token from Tokenizer and increases column number
-     * @return
-     * @throws IOException 
      */
     private int nextToken() throws IOException {
         //colnr += tokenizer.sval != null ? tokenizer.sval.length() : 1;
@@ -91,7 +89,6 @@ public class PipedArgsParser {
 
     /**
      * Gets current token of Tokenizer
-     * @return 
      */
     private int currentToken() {
         return tokenizer.ttype;
@@ -122,7 +119,7 @@ public class PipedArgsParser {
     }
 
 
-    class Varbox {
+    static class Varbox {
         String stdin = "";
         String stdout = "";
         Vector<Command> commands = new Vector<Command>();
@@ -133,10 +130,16 @@ public class PipedArgsParser {
         public String action = "";
         public Map<String, String> pairs = new HashMap<String, String>();
 
+        @Override
         public boolean equals( Object oo ) {
             Command o = (Command)oo;
             return this.tool.equals(o.tool) && this.action.equals(o.action)
                     && this.pairs.equals(o.pairs);
+        }
+        
+        @Override
+        public int hashCode() {
+            return this.tool.hashCode() ^ this.action.hashCode() ^ this.pairs.hashCode();
         }
     }
 
@@ -247,7 +250,7 @@ public class PipedArgsParser {
 
     }
 
-    private Entry PAIR() throws IOException {
+    private Entry<String, String> PAIR() throws IOException {
         String key = null;
         String value = null;
 

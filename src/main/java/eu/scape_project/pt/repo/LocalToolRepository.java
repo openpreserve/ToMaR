@@ -35,14 +35,12 @@ public class LocalToolRepository implements Repository {
     /**
      * Construct repository from directory path.
      * @param strToolsDir directory to toolspecs
-     * @throws FileNotFoundException 
      */
     public LocalToolRepository(String strToolsDir) throws FileNotFoundException {
-        File toolsDir = new File( strToolsDir );
-        if( !toolsDir.isDirectory() ) 
-            throw new FileNotFoundException();
-
-        this.toolsDir = toolsDir;
+        this.toolsDir = new File( strToolsDir );
+        if( !toolsDir.isDirectory() ) {
+            throw new FileNotFoundException(toolsDir.toString());
+        }
     }
 
     @Override
@@ -58,10 +56,6 @@ public class LocalToolRepository implements Repository {
 
     /**
      * Gets Tool from the repository.
-     * 
-     * @param toolName
-     * @return
-     * @throws FileNotFoundException 
      */
     public Tool getTool(String toolName ) throws FileNotFoundException {
         File fileTool = new File( this.toolsDir.getPath() + 
@@ -74,14 +68,10 @@ public class LocalToolRepository implements Repository {
             LOG.error(ex);
         }
         return null;
-        
     }
 
     /**
      * Unmarshals an input stream of xml data to a Tool.
-     * @param input
-     * @return
-     * @throws JAXBException 
      */
     private Tool fromInputStream(InputStream input) throws JAXBException {
 		Unmarshaller u = jc.createUnmarshaller();

@@ -15,7 +15,7 @@ public class StreamProcessor extends Processor {
      * Creates a StreamProcessor that functions as a reader for the 
      * given InputStream.
      * 
-     * @param InputStream iStdOut 
+     * @param iIn iStdOut 
      */
     public StreamProcessor(InputStream iIn) {
         this.iStdOut = iIn;
@@ -26,7 +26,7 @@ public class StreamProcessor extends Processor {
      * Creates a StreamProcessor that functions as a writer for the 
      * given OutputStream.
      * 
-     * @param OutputStream oStdIn 
+     * @param osOut oStdIn 
      */
     public StreamProcessor(OutputStream osOut) {
         this.oStdIn = osOut;
@@ -36,8 +36,6 @@ public class StreamProcessor extends Processor {
     /**
      * Reads a previous processor's stream and writes to it's own or
      * simply executes the next processor. 
-     * @return
-     * @throws Exception 
      */
     @Override
     public int execute() throws Exception {
@@ -59,9 +57,6 @@ public class StreamProcessor extends Processor {
 
     /**
      * Waits for the previous processor to terminate.
-     * 
-     * @return
-     * @throws InterruptedException 
      */
     @Override
     public int waitFor() throws InterruptedException {
