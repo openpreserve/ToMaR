@@ -19,8 +19,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import eu.scape_project.pt.util.PipedArgsParser.Command;
-
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -35,13 +33,13 @@ public class PipedArgsParserTest {
     @Test
     public void testParse() throws IOException {
         LOG.info("TEST parse");
-        PipedArgsParser parser = new PipedArgsParser();
+        CmdLineParser parser = new PipedArgsParser();
 
         LOG.info("TEST good input, dashes in keys");
         String strCmdLine = "a-tool a-action --input-one=\"bla\" --input-two=\"5\"";
         parser.parse(strCmdLine);
 
-        Command command1 = parser.new Command();
+        Command command1 = new Command();
         command1.action = "a-action";
         command1.tool = "a-tool";
         command1.pairs = new HashMap<String, String>() {{
@@ -118,7 +116,7 @@ public class PipedArgsParserTest {
         strCmdLine += " | b-tool b-action --input2=\"test\"";
         parser.parse(strCmdLine);
 
-        Command command2 = parser.new Command();
+        Command command2 = new Command();
         command2.tool = "b-tool";
         command2.action = "b-action";
         command2.pairs = new HashMap<String, String>() {{
@@ -136,7 +134,7 @@ public class PipedArgsParserTest {
         strCmdLine += " | c-tool c-action --input3=\"bla\"";
         parser.parse(strCmdLine);
 
-        Command command3 = parser.new Command();
+        Command command3 = new Command();
         command3.tool = "c-tool";
         command3.action = "c-action";
         command3.pairs = new HashMap<String, String>() {{

@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
@@ -32,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author Matthias Rella, DME-AIT
  */
-public class PipedArgsParser {
+public class PipedArgsParser implements CmdLineParser {
 
     private static Log LOG = LogFactory.getLog(PipedArgsParser.class);
 
@@ -62,6 +60,7 @@ public class PipedArgsParser {
      * Results can be fetched via getters.
      * @param strCmdLine input String
      */
+    @Override
     public void parse(String strCmdLine) throws IOException {
 
         strStdinFile = "";
@@ -98,6 +97,7 @@ public class PipedArgsParser {
      * Gets recognized commands 
      * @return Map mapArguments
      */
+    @Override
     public Command[] getCommands() {
         return this.commands;
     }
@@ -106,6 +106,7 @@ public class PipedArgsParser {
      * Gets recognized stdin file name
      * @return String
      */
+    @Override
     public String getStdinFile() {
         return this.strStdinFile == "" ? null : this.strStdinFile;
     }
@@ -114,33 +115,15 @@ public class PipedArgsParser {
      * Gets recognized stdout file name
      * @return String
      */
+    @Override
     public String getStdoutFile() {
         return this.strStdoutFile == "" ? null : this.strStdoutFile;
     }
-
 
     static class Varbox {
         String stdin = "";
         String stdout = "";
         Vector<Command> commands = new Vector<Command>();
-    }
-
-    public class Command {
-        public String tool = "";
-        public String action = "";
-        public Map<String, String> pairs = new HashMap<String, String>();
-
-        @Override
-        public boolean equals( Object oo ) {
-            Command o = (Command)oo;
-            return this.tool.equals(o.tool) && this.action.equals(o.action)
-                    && this.pairs.equals(o.pairs);
-        }
-        
-        @Override
-        public int hashCode() {
-            return this.tool.hashCode() ^ this.action.hashCode() ^ this.pairs.hashCode();
-        }
     }
 
     /**
@@ -290,6 +273,5 @@ public class PipedArgsParser {
         }
         return c;
     }
-
 
 }

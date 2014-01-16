@@ -6,8 +6,9 @@ import eu.scape_project.pt.proc.ToolProcessor;
 import eu.scape_project.pt.repo.ToolRepository;
 import eu.scape_project.pt.tool.Operation;
 import eu.scape_project.pt.tool.Tool;
+import eu.scape_project.pt.util.CmdLineParser;
+import eu.scape_project.pt.util.Command;
 import eu.scape_project.pt.util.PipedArgsParser;
-import eu.scape_project.pt.util.PipedArgsParser.Command;
 import eu.scape_project.pt.util.PropertyNames;
 import eu.scape_project.pt.util.fs.Filer;
 
@@ -38,7 +39,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
 
     private static Log LOG = LogFactory.getLog(ToolspecMapper.class);
 
-    private PipedArgsParser parser;
+    private CmdLineParser parser;
     private ToolRepository repo;
     private Tool tool;
     private Operation operation;
