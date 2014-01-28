@@ -131,13 +131,13 @@ public class ToolProcessorTest extends Configured {
         LOG.debug("tmpInputFile = " + tmpInputFile );
 
         mapInput = new HashMap<String, String>();
-        mapInput.put("inFile", tmpInputFile );
+        mapInput.put("input", tmpInputFile );
 
         String tmpOutputFile = File.createTempFile("ps2pdf", ".pdf").getAbsolutePath();
         LOG.debug("tmpOutputFile = " + tmpOutputFile );
 
         Map<String, String> mapOutput = new HashMap<String, String>();
-        mapOutput.put("outFile", tmpOutputFile );
+        mapOutput.put("output", tmpOutputFile );
 
         processor.setInputFileParameters( mapInput );
         processor.setOutputFileParameters( mapOutput );
@@ -183,5 +183,45 @@ public class ToolProcessorTest extends Configured {
                     ex);
         }
     }
+
+    @Test
+    public void testExecuteTarMultipleInputFiles() throws Exception {
+        LOG.info("TEST zip");
+        Tool tool = repo.getTool("tar");
+
+        String tmpInputFile1 = this.getClass().getClassLoader().getResource("ps2pdf-input.ps").getFile();
+        String tmpInputFile2 = this.getClass().getClassLoader().getResource("ps2pdf-output.pdf").getFile();
+        String tmpInputFile = tmpInputFile1 + " " + tmpInputFile2;
+
+        ToolProcessor processor = new ToolProcessor(tool);
+        Operation operation = processor.findOperation("tar");
+        processor.setOperation(operation);
+
+        Map<String, String> mapInput = new HashMap<String, String>();
+
+        LOG.debug("tool = " + tool.getName());
+
+        LOG.debug("tmpInputFile = " + tmpInputFile );
+
+        mapInput = new HashMap<String, String>();
+        mapInput.put("input", tmpInputFile );
+
+        String tmpOutputFile = File.createTempFile("zipped", ".tar").getAbsolutePath();
+        LOG.debug("tmpOutputFile = " + tmpOutputFile );
+
+        Map<String, String> mapOutput = new HashMap<String, String>();
+        mapOutput.put("output", tmpOutputFile );
+
+        processor.setInputFileParameters( mapInput );
+        processor.setOutputFileParameters( mapOutput );
+        try {
+            processor.execute();
+        } catch ( IOException ex ) {
+            LOG.error(
+                "Exception during execution (maybe unresolved system dependency?): ",
+                    ex);
+        }
+    }
+
 
 }
