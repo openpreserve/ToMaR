@@ -142,6 +142,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
                     for( int i = 0; i < remoteFileRefs.length; i++ ){
                         Filer filer = Filer.create(entry.getValue());
                         filer.setDirectory(context.getTaskAttemptID().toString());
+                        filer.localize();
                         localFileRefs = localFileRefs + sep + filer.getFileRef();
                     }
                     mapTempOutputFileParameters.put( entry.getKey(), localFileRefs.substring(1));

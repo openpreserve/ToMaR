@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,8 +34,8 @@ public class HDFSFiler extends Filer {
      */
     private final Path file;
 
-    HDFSFiler(String value) throws IOException {
-        this.file = new Path(value);
+    HDFSFiler(URI uri) throws IOException {
+        this.file = new Path(uri);
         hdfs = file.getFileSystem(new Configuration());
     }
 	
@@ -87,13 +88,19 @@ public class HDFSFiler extends Filer {
     @Override
     public void localize() throws IOException {
         Path localfile = new Path( getFileRef() );
-        hdfs.copyToLocalFile(file, localfile);
+        if(hdfs.exists(file)) {
+            hdfs.copyToLocalFile(file, localfile);
+        }
     }
 
     @Override
     public void delocalize() throws IOException {
         Path localfile = new Path( getFileRef() );
-        hdfs.copyFromLocalFile(localfile, file);
+        //hdfs.copyFromLocalFile(localfile, file);
+        this.depositDirectoryOrFile(getFileRef(), file.toString());
+        // TODO: if output ref is a directory, the directory exists as a file in the temp locaiton. this directory is copied as is to HDFS
+        // eg. --output="/some/dir/data" will result in /some/dir/data/data on HDFS if /some/dir/data already exists on HDFS. 
+        // we should circumvent this, by checking if a directory exists. and we also need to create the directory on the local system if it exists on HDFS already (in localize)
     }
 
     @Override
