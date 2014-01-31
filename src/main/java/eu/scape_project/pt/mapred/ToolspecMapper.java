@@ -13,6 +13,7 @@ import eu.scape_project.pt.util.PropertyNames;
 import eu.scape_project.pt.util.fs.Filer;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -93,6 +94,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
             Map<String, String>[] mapInputFileParameters = new HashMap[commands.length];
             Map<String, String>[] mapOutputFileParameters = new HashMap[commands.length];
 
+            String directory = System.getProperty("user.dir");
             for(int c = 0; c < commands.length; c++ ) {
                 Command command = commands[c];
 
@@ -128,9 +130,9 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
                     String localFileRefs = "";
                     for( int i = 0; i < remoteFileRefs.length; i++ ){
                         Filer filer = Filer.create(remoteFileRefs[i]);
-                        filer.setDirectory(context.getTaskAttemptID().toString());
+                        filer.setDirectory(directory);
                         filer.localize();
-                        localFileRefs = localFileRefs + sep + filer.getFileRef();
+                        localFileRefs = localFileRefs + sep + filer.getRelativeFileRef();
                     }
                     mapTempInputFileParameters.put( entry.getKey(), localFileRefs.substring(1));
                 }
@@ -141,9 +143,9 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
                     String localFileRefs = "";
                     for( int i = 0; i < remoteFileRefs.length; i++ ){
                         Filer filer = Filer.create(entry.getValue());
-                        filer.setDirectory(context.getTaskAttemptID().toString());
+                        filer.setDirectory(directory);
                         filer.localize();
-                        localFileRefs = localFileRefs + sep + filer.getFileRef();
+                        localFileRefs = localFileRefs + sep + filer.getRelativeFileRef();
                     }
                     mapTempOutputFileParameters.put( entry.getKey(), localFileRefs.substring(1));
                 }
@@ -192,8 +194,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
                     String[] localFileRefs = strFile.split(sep);
                     for( int j = 0; j < localFileRefs.length; j++ ){
                         Filer filer = Filer.create(localFileRefs[j]);
-                        LOG.info("dir = " + context.getTaskAttemptID().toString() );
-                        filer.setDirectory(context.getTaskAttemptID().toString());
+                        filer.setDirectory(directory);
                         filer.delocalize();
                     }
                 }

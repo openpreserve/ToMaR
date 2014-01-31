@@ -21,13 +21,13 @@ import org.apache.hadoop.fs.Path;
  * @author Martin Schenck [schenck]
  */
 public class HDFSFiler extends Filer {
-	
-	private static Log LOG = LogFactory.getLog(HDFSFiler.class);
-	
+    
+    private static Log LOG = LogFactory.getLog(HDFSFiler.class);
+    
     /**
      * Hadoop Filesystem handle.
      */
-	private final FileSystem hdfs;
+    private final FileSystem hdfs;
 
     /**
      * File to handle by this filer
@@ -38,56 +38,58 @@ public class HDFSFiler extends Filer {
         this.file = new Path(uri);
         hdfs = file.getFileSystem(new Configuration());
     }
-	
+    
     @Override
-	public File copyFile(String strSrc, String strDest) throws IOException {
-		Path path = new Path(strSrc);
-		if(!hdfs.exists(path)) throw new IOException("file does not exist! "+strSrc);
-		//File temp = File.createTempFile(path.getName(), "", tempDir);		
+    public File copyFile(String strSrc, String strDest) throws IOException {
+        Path path = new Path(strSrc);
+        if(!hdfs.exists(path)) throw new IOException("file does not exist! "+strSrc);
+        //File temp = File.createTempFile(path.getName(), "", tempDir);     
         File temp = new File( strDest );
-		hdfs.copyToLocalFile(path, new Path(strDest));
-		return temp;
-	}
-	
-	@Override
-	public void depositDirectoryOrFile(String strSrc, String strDest) throws IOException {
+        hdfs.copyToLocalFile(path, new Path(strDest));
+        return temp;
+    }
+    
+    @Override
+    public void depositDirectoryOrFile(String strSrc, String strDest) throws IOException {
         File source = new File( strSrc );
-		if(source.isDirectory()) {
-			depositDirectory(strSrc, strDest);
-		} else {
-			depositFile(strSrc, strDest);
-		}
-	}
-	
-	@Override
-	public void depositDirectory(String strSrc, String strDest) throws IOException {
-		// Get output directory name from strSrc
+        if(source.isDirectory()) {
+            depositDirectory(strSrc, strDest);
+        } else {
+            depositFile(strSrc, strDest);
+        }
+    }
+    
+    @Override
+    public void depositDirectory(String strSrc, String strDest) throws IOException {
+        // Get output directory name from strSrc
         File localDir = new File( strSrc );
-		
-		if(!localDir.isDirectory()) {
-			throw new IOException("Could not find correct local output directory: " + localDir );
-		}
-		
-		LOG.info("Local directory is: " + localDir );
-		
-        // FIXME if strSrc is a directory then strDest should be a directory too
-		for(File localFile : localDir.listFiles()) {
-			depositDirectoryOrFile(localFile.getCanonicalPath(), strDest + File.separator + localFile.getName());
-		}
-	}
+        
+        if(!localDir.isDirectory()) {
+            throw new IOException("Could not find correct local output directory: " + localDir );
+        }
+        
+        LOG.debug("Local directory is: " + localDir );
+        
+        for(File localFile : localDir.listFiles()) {
+            depositDirectoryOrFile(localFile.getCanonicalPath(), strDest + File.separator + localFile.getName());
+        }
+    }
 
-	@Override
-	public void depositFile(String strSrc, String strDest) throws IOException {
-		Path src = new Path(strSrc);
-		Path dest = new Path(strDest);
-		
-		LOG.info("local file name is: "+src+" destination path is:" +dest);
-		hdfs.copyFromLocalFile(src, dest);
-	}
+    @Override
+    public void depositFile(String strSrc, String strDest) throws IOException {
+        Path src = new Path(strSrc);
+        Path dest = new Path(strDest);
+        
+        LOG.debug("local file name is: "+src+" destination path is:" +dest);
+        hdfs.copyFromLocalFile(src, dest);
+    }
 
     @Override
     public void localize() throws IOException {
-        Path localfile = new Path( getFileRef() );
+        File fileRef = new File(getFileRef());
+        LOG.debug("localize " + fileRef);
+        new File(fileRef.getParent()).mkdirs();
+        Path localfile = new Path( fileRef.toString() );
         if(hdfs.exists(file)) {
             hdfs.copyToLocalFile(file, localfile);
         }
@@ -95,30 +97,56 @@ public class HDFSFiler extends Filer {
 
     @Override
     public void delocalize() throws IOException {
-        Path localfile = new Path( getFileRef() );
-        //hdfs.copyFromLocalFile(localfile, file);
         this.depositDirectoryOrFile(getFileRef(), file.toString());
-        // TODO: if output ref is a directory, the directory exists as a file in the temp locaiton. this directory is copied as is to HDFS
-        // eg. --output="/some/dir/data" will result in /some/dir/data/data on HDFS if /some/dir/data already exists on HDFS. 
-        // we should circumvent this, by checking if a directory exists. and we also need to create the directory on the local system if it exists on HDFS already (in localize)
     }
 
     @Override
     public void setDirectory(String strDir ) {
-        File tempDir = new File(getTmpDir() + strDir );
-        tempDir.mkdir();
-        this.dir = strDir;
+        LOG.debug("setDirectory " + strDir );
+        File dir = new File(strDir);
+        if( !dir.isAbsolute() ) {
+            this.dir = this.getTmpDir() + strDir;
+        } else {
+            this.dir = strDir;
+        }
+        LOG.debug("this.dir = " + this.dir );
     }
 
     @Override
     public String getFileRef() {
-        // TODO introduce a namespace for temp files so that
-        // other running tasks on the machine don't interfere
-        return getTmpDir()
-                    + (this.dir.isEmpty() 
-                            ? "hdfsfiler_" + file.hashCode() + "-" 
-                            : this.dir + System.getProperty("file.separator")) 
-                    + file.getName();
+        return this.getFullDirectory();
+    }
+
+    @Override
+    public String getRelativeFileRef() {
+        String path = this.getPath();
+        if( path.startsWith(System.getProperty("file.separator")) )
+            path = path.substring(1);
+        return path;
+    }
+
+    /**
+     * Returns the user defined directory of the file.
+     */
+    public String getPath() {
+        URI uri = this.file.toUri();
+        
+        String path = uri.getPath();
+        LOG.debug("path = " + path);
+        String sep = System.getProperty("file.separator");
+        return path.replace(Path.SEPARATOR, sep);
+    }
+
+    /**
+     * Returns working space directory with user defined directories.
+     */
+    public String getFullDirectory() {
+        String sep = System.getProperty("file.separator");
+        String par = this.getPath();
+        return (this.dir.isEmpty() 
+                ? "hdfsfiler_" + file.hashCode()
+                : this.dir) 
+                + par;
     }
 
     @Override

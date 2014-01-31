@@ -38,8 +38,6 @@ public abstract class Filer {
     }
 
     public String getTmpDir() {
-        // TODO introduce a namespace for temp files so that
-        // other running tasks on the machine don't interfere
         return System.getProperty("java.io.tmpdir") 
                 + System.getProperty("file.separator");
     }
@@ -90,5 +88,7 @@ public abstract class Filer {
      * Gets the output stream to a file.
      */
     public abstract OutputStream getOutputStream() throws IOException;
+
+	public abstract String getRelativeFileRef();
 
 }
