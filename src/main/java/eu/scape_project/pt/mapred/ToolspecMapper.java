@@ -13,7 +13,6 @@ import eu.scape_project.pt.util.PropertyNames;
 import eu.scape_project.pt.util.fs.Filer;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,7 +69,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
      * 3. Chain piped commands to a simple-chained list of processors and run them.
      * 4. "De-localize" output files and output streams
      *
-     * @param key TODO what type?
+     * @param key offset in control file
      * @param value line describing the (piped) command(s) and stdin/out file refs
      * @param context Job context
      */
