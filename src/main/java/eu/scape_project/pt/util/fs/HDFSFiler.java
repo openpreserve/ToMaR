@@ -39,18 +39,10 @@ public class HDFSFiler extends Filer {
         hdfs = file.getFileSystem(new Configuration());
     }
     
-    @Override
-    public File copyFile(String strSrc, String strDest) throws IOException {
-        Path path = new Path(strSrc);
-        if(!hdfs.exists(path)) throw new IOException("file does not exist! "+strSrc);
-        //File temp = File.createTempFile(path.getName(), "", tempDir);     
-        File temp = new File( strDest );
-        hdfs.copyToLocalFile(path, new Path(strDest));
-        return temp;
-    }
-    
-    @Override
-    public void depositDirectoryOrFile(String strSrc, String strDest) throws IOException {
+    /**
+     * Copies a file or directory from the local filesystem to a remote one.
+     */
+    private void depositDirectoryOrFile(String strSrc, String strDest) throws IOException {
         File source = new File( strSrc );
         if(source.isDirectory()) {
             depositDirectory(strSrc, strDest);
@@ -59,8 +51,10 @@ public class HDFSFiler extends Filer {
         }
     }
     
-    @Override
-    public void depositDirectory(String strSrc, String strDest) throws IOException {
+    /**
+     * Copies a directory from the local filesystem to a remote one.
+     */
+    private void depositDirectory(String strSrc, String strDest) throws IOException {
         // Get output directory name from strSrc
         File localDir = new File( strSrc );
         
@@ -75,8 +69,10 @@ public class HDFSFiler extends Filer {
         }
     }
 
-    @Override
-    public void depositFile(String strSrc, String strDest) throws IOException {
+    /**
+     * Copies a file from the local filesystem to a remote one.
+     */
+    private void depositFile(String strSrc, String strDest) throws IOException {
         Path src = new Path(strSrc);
         Path dest = new Path(strDest);
         
@@ -86,7 +82,7 @@ public class HDFSFiler extends Filer {
 
     @Override
     public void localize() throws IOException {
-        File fileRef = new File(getFileRef());
+        File fileRef = new File(getAbsoluteFileRef());
         LOG.debug("localize " + fileRef);
         new File(fileRef.getParent()).mkdirs();
         Path localfile = new Path( fileRef.toString() );
@@ -97,7 +93,7 @@ public class HDFSFiler extends Filer {
 
     @Override
     public void delocalize() throws IOException {
-        this.depositDirectoryOrFile(getFileRef(), file.toString());
+        this.depositDirectoryOrFile(getAbsoluteFileRef(), file.toString());
     }
 
     @Override
@@ -113,7 +109,7 @@ public class HDFSFiler extends Filer {
     }
 
     @Override
-    public String getFileRef() {
+    public String getAbsoluteFileRef() {
         return this.getFullDirectory();
     }
 
@@ -128,7 +124,7 @@ public class HDFSFiler extends Filer {
     /**
      * Returns the user defined directory of the file.
      */
-    public String getPath() {
+    private String getPath() {
         URI uri = this.file.toUri();
         
         String path = uri.getPath();
@@ -140,7 +136,7 @@ public class HDFSFiler extends Filer {
     /**
      * Returns working space directory with user defined directories.
      */
-    public String getFullDirectory() {
+    private String getFullDirectory() {
         String sep = System.getProperty("file.separator");
         String par = this.getPath();
         return (this.dir.isEmpty() 

@@ -1,6 +1,5 @@
 package eu.scape_project.pt.util.fs;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -27,8 +26,7 @@ public abstract class Filer {
         try {
             uri = new URI(strUri);
         } catch (URISyntaxException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new IOException(e);
         }
         String scheme = uri.getScheme();
         if( scheme.equals("hdfs")) {
@@ -42,42 +40,32 @@ public abstract class Filer {
                 + System.getProperty("file.separator");
     }
     
+    /**
+     * Sets the working directory where to localize remote files or directories to.
+     */
     public abstract void setDirectory(String strDir ) throws IOException;
 
     /**
-     * Copies a file from a remote filesystem to the local one.
-     */
-    public abstract File copyFile(String strSrc, String strDest) throws IOException; 
-    /**
-     * Copies a file or directory from the local filesystem to a remote one.
-     */
-    public abstract void depositDirectoryOrFile(String srcSrc, String strDest) throws IOException; 
-
-    /**
-     * Copies a directory from the local filesystem to a remote one.
-     */
-    public abstract void depositDirectory(String strSrc, String strDest) throws IOException;
-    
-    /**
-     * Copies a file from the local filesystem to a remote one.
-     */
-    public abstract void depositFile(String strSrc, String strDest) throws IOException;
-
-    /**
-     * Copies file to local filesystem.
+     * Copies file or directory to local filesystem.
      */
     public abstract void localize() throws IOException;
 
     /**
-     * Copies file from local filesystem to remote one.
+     * Copies file or directory from local filesystem to remote one.
      */
     public abstract void delocalize() throws IOException;
 
     /**
-     * Gets the local file reference of the filer's file.
+     * Gets the absolute local file reference of the filer's file.
      * @return String fileRef
      */
-    public abstract String getFileRef();
+    public abstract String getAbsoluteFileRef();
+
+    /**
+     * Gets the relative local file reference of the filer's file.
+     * @return String fileRef
+     */
+    public abstract String getRelativeFileRef();
 
     /**
      * Gets the input stream of a file.
@@ -88,7 +76,5 @@ public abstract class Filer {
      * Gets the output stream to a file.
      */
     public abstract OutputStream getOutputStream() throws IOException;
-
-	public abstract String getRelativeFileRef();
 
 }
