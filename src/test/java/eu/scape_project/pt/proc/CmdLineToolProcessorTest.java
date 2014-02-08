@@ -34,8 +34,8 @@ import org.apache.hadoop.conf.Configured;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ToolProcessorTest extends Configured {
-    private static final Log LOG = LogFactory.getLog(ToolProcessorTest.class);
+public class CmdLineToolProcessorTest extends Configured {
+    private static final Log LOG = LogFactory.getLog(CmdLineToolProcessorTest.class);
     
     private LocalToolRepository repo;
 
@@ -56,10 +56,11 @@ public class ToolProcessorTest extends Configured {
 
         LOG.info("TEST file-identify");
 
-        ToolProcessor processor = new ToolProcessor(tool);
+        ToolProcessorBuilder builder = new ToolProcessorBuilder();
 
-        Operation operation = processor.findOperation("identify");
-        processor.setOperation(operation);
+        builder.setTool(tool);
+        builder.setOperation(builder.findOperation("identify"));
+        ToolProcessor processor = builder.getProcessor();
 
         Map<String, String> mapInput = new HashMap<String, String>();
         mapInput.put("input", tmpInputFile );
@@ -90,9 +91,11 @@ public class ToolProcessorTest extends Configured {
 
         String tmpInputFile = this.getClass().getClassLoader().getResource("ps2pdf-input.ps").getFile();
 
-        ToolProcessor processor = new ToolProcessor(tool);
-        Operation operation = processor.findOperation("identify-stdin");
-        processor.setOperation(operation);
+        ToolProcessorBuilder builder = new ToolProcessorBuilder();
+        builder.setTool(tool);
+        
+        builder.setOperation(builder.findOperation("identify-stdin"));
+        ToolProcessor processor = builder.getProcessor();
 
         FileInputStream fin = new FileInputStream( new File( tmpInputFile ));
         StreamProcessor in = new StreamProcessor(fin);
@@ -120,9 +123,10 @@ public class ToolProcessorTest extends Configured {
 
         String tmpInputFile = this.getClass().getClassLoader().getResource("ps2pdf-input.ps").getFile();
 
-        ToolProcessor processor = new ToolProcessor(tool);
-        Operation operation = processor.findOperation("convert");
-        processor.setOperation(operation);
+        ToolProcessorBuilder builder = new ToolProcessorBuilder();
+        builder.setTool(tool);
+        builder.setOperation(builder.findOperation("convert"));
+        ToolProcessor processor = builder.getProcessor();
 
         Map<String, String> mapInput = new HashMap<String, String>();
 
@@ -159,9 +163,10 @@ public class ToolProcessorTest extends Configured {
                 .getResource("ps2pdf-input.ps").getFile();
         String tmpOutputFile = File.createTempFile("ps2pdf", ".pdf").getAbsolutePath();
 
-        ToolProcessor processor = new ToolProcessor(tool);
-        Operation operation = processor.findOperation("convert-streamed");
-        processor.setOperation(operation);
+        ToolProcessorBuilder builder = new ToolProcessorBuilder();
+        builder.setTool(tool);
+        builder.setOperation(builder.findOperation("convert-streamed"));
+        ToolProcessor processor = builder.getProcessor();
 
         LOG.debug("tmpInputFile = " + tmpInputFile );
 
@@ -193,9 +198,12 @@ public class ToolProcessorTest extends Configured {
         String tmpInputFile2 = this.getClass().getClassLoader().getResource("ps2pdf-output.pdf").getFile();
         String tmpInputFile = tmpInputFile1 + " " + tmpInputFile2;
 
-        ToolProcessor processor = new ToolProcessor(tool);
-        Operation operation = processor.findOperation("tar");
-        processor.setOperation(operation);
+        ToolProcessorBuilder builder = new ToolProcessorBuilder();
+        
+        builder.setTool(tool);
+        builder.setOperation(builder.findOperation("tar"));
+        ToolProcessor processor = builder.getProcessor();
+        
 
         Map<String, String> mapInput = new HashMap<String, String>();
 

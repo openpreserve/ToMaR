@@ -12,3 +12,8 @@ target/
 
 # Mac OS X
 .DS_Store
+
+# vi
+.session.vim
+.*.swp
+

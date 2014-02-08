@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tool xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://scape-project.eu/tool tool-1.0_draft.xsd" xmlns="http://scape-project.eu/tool" xmlns:xlink="http://www.w3.org/1999/xlink" schemaVersion="1.0" name="FFmpeg" version="1.0.1" homepage="http://ffmpeg.org/">
+  <installation>
+    <dependency operatingSystemName="Debian">helloworld</dependency>
+    <license type="Apache Licence 2.0">Apache License, Version 2.0</license>
+  </installation>
+  <otherProperties>
+    <property name="cost">0</property>
+  </otherProperties>
+  <operations>
+    <operation name="world">
+      <description>Greets world</description>
+      <command>/usr/bin/java eu.scape_project.pt.proc.HelloWorld ${say}</command>
+      <inputs>
+        <input name="say" required="true">
+          <description>The greeting</description>
+        </input>
+      </inputs>
+    </operation>
+  </operations>
+</tool>

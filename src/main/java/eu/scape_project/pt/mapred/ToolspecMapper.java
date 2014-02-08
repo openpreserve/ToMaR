@@ -3,6 +3,7 @@ package eu.scape_project.pt.mapred;
 import eu.scape_project.pt.proc.Processor;
 import eu.scape_project.pt.proc.StreamProcessor;
 import eu.scape_project.pt.proc.ToolProcessor;
+import eu.scape_project.pt.proc.ToolProcessorBuilder;
 import eu.scape_project.pt.repo.ToolRepository;
 import eu.scape_project.pt.tool.Operation;
 import eu.scape_project.pt.tool.Tool;
@@ -99,16 +100,16 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
 
                 this.tool = repo.getTool(command.getTool());
 
-                lastProcessor = new ToolProcessor(this.tool);
-
-                this.operation = lastProcessor.findOperation(command.getAction());
+                ToolProcessorBuilder builder = new ToolProcessorBuilder();
+                builder.setTool(this.tool);
+                this.operation = builder.findOperation(command.getAction());
                 if( this.operation == null )
                     throw new IOException(
                             "operation " + command.getAction() + " not found");
 
-                lastProcessor.setOperation(this.operation);
+                builder.setOperation(this.operation);
 
-                lastProcessor.initialize();
+                lastProcessor = builder.getProcessor();
 
                 lastProcessor.setParameters(command.getPairs());
 

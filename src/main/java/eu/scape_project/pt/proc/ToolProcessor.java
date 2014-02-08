@@ -2,7 +2,6 @@ package eu.scape_project.pt.proc;
 
 import eu.scape_project.pt.tool.Input;
 import eu.scape_project.pt.tool.Operation;
-import eu.scape_project.pt.tool.Operations;
 import eu.scape_project.pt.tool.Output;
 import eu.scape_project.pt.tool.Parameter;
 import eu.scape_project.pt.tool.Tool;
@@ -10,53 +9,48 @@ import eu.scape_project.pt.tool.Tool;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Creates processes for a Tool.
+ * Abstract class for Common Toolspec features
  *
  * @author Matthias Rella [my_rho]
  */
-public class ToolProcessor extends Processor {
+abstract public class ToolProcessor extends Processor {
 
     private static Log LOG = LogFactory.getLog(ToolProcessor.class);
 
     /**
      * Operation of a Tool to use.
      */
-    private Operation operation;
+    protected Operation operation;
 
     /**
      * Tool to use.
      */
-    private Tool tool;
+    protected Tool tool;
 
     /**
      * Parameters referring to input files.
      */
-    private Map<String, String> mapInputFileParameters;
+    protected Map<String, String> mapInputFileParameters;
 
     /**
      * Parameters referring to output files.
      */
-    private Map<String, String> mapOutputFileParameters;
+    protected Map<String, String> mapOutputFileParameters;
 
     /**
      * Other Parameters. 
      */
-    private Map<String, String> mapOtherParameters;
+    protected Map<String, String> mapOtherParameters;
 
     /**
-     * Underlying sub-process.
-     */
-    private Process proc;
-
-    /**
-     * Constructs the processor with a tool and an action of a
+     * Constructs the processor with a tool of a Toolspec
      * toolspec.
      */
     public ToolProcessor(Tool tool) {
@@ -65,75 +59,21 @@ public class ToolProcessor extends Processor {
     }
 
     /**
-     * Tries to find a operation of the tool.
-     * 
-     * @param strOp Operation 
+     * Constructs the processor with a tool and an operation of a Toolspec
+     * toolspec.
      */
-    public Operation findOperation( String strOp ) {
-        LOG.debug("findOperation(" + strOp + ")");
-        Operations operations = tool.getOperations();
-        for (Operation op : operations.getOperation()) {
-            LOG.debug("op = " + op.getName());
-            if (op.getName().equals(strOp)) {
-                return op;
-            }
-        }
-        return null;
+    public ToolProcessor(Tool tool, Operation operation) {
+        this.tool = tool;
+        this.operation = operation;
+        debugToken = 'T';
     }
+
 
     /**
      * Sets the operation to use for execution. 
      */
     public void setOperation( Operation op ) {
         this.operation = op;
-    }
-
-    /**
-     * Executes the tool, optionally reading from a previous process (stdin).
-     * All input file parameters need to be local to the machine.
-     */
-    @Override
-    public int execute() throws Exception {
-        LOG.debug("execute");
-
-        Map<String, String> allInputs = new HashMap<String, String>();
-        allInputs.putAll(getInputFileParameters());
-        allInputs.putAll(getOutputFileParameters());
-        allInputs.putAll(getOtherParameters());
-
-        for (String key : allInputs.keySet()) {
-            LOG.debug("Key: " + key + " = " + allInputs.get(key));
-        }
-
-        String strCmd = replaceAll(this.operation.getCommand(), allInputs);
-
-        LOG.debug("strCmd = " + strCmd );
-
-		proc = Runtime.getRuntime().exec(strCmd);
-
-        this.setStdIn(proc.getOutputStream());
-        this.setStdOut(proc.getInputStream());
-
-        new Thread(this).start();
-
-        if( this.next != null )
-            return this.next.execute();
-
-        return proc.waitFor();
-    }
-
-    /** 
-     * Waits for the sub-process to terminate.
-     */
-    @Override
-    public int waitFor() throws InterruptedException {
-        if( proc == null ) return 0;
-        LOG.debug("waitFor");
-        return proc.waitFor();
-    }
-
-    @Override
-    public void initialize() {
     }
 
     /**
@@ -222,8 +162,8 @@ public class ToolProcessor extends Processor {
     /**
      * Replaces ${key}s in given command strCmd by values.
      */
-	 private String replaceAll(String strCmd, Map<String,String> mapInputs) {
-         if( mapInputs.isEmpty() ) return strCmd;
+    protected String replaceAll(String strCmd, Map<String,String> mapInputs) {
+        if( mapInputs.isEmpty() ) return strCmd;
         // create the pattern wrapping the keys with ${} and join them with '|'
         String regexp = "";
         for( String input : mapInputs.keySet())
@@ -244,13 +184,13 @@ public class ToolProcessor extends Processor {
 
         return sb.toString();
 
-	}
+    }
 
     /**
      * Maps a parameter name to the placeholder's form.
      * Inverse of placeholderToParameter.
      */
-    private String parameterToPlaceholder( String strParameter ) {
+    protected String parameterToPlaceholder( String strParameter ) {
         return "\\$\\{" + strParameter + "\\}|"; 
     }
 
@@ -258,7 +198,7 @@ public class ToolProcessor extends Processor {
      * Maps a placeholder to its parameter name.
      * Inverse of parameterToPlaceholder.
      */
-    private String placeholderToParameter( String strVariable ) {
+    protected String placeholderToParameter( String strVariable ) {
         return strVariable.substring(2, strVariable.length() - 1 );
     }
 }
