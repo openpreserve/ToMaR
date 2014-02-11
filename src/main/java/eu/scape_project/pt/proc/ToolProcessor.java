@@ -106,10 +106,10 @@ public class ToolProcessor extends Processor {
         }
 
         String strCmd = replaceAll(this.operation.getCommand(), allInputs);
-
         LOG.debug("strCmd = " + strCmd );
 
-		proc = Runtime.getRuntime().exec(strCmd);
+        String[] cmd = {"sh", "-c", strCmd};
+        proc = Runtime.getRuntime().exec(cmd);
 
         this.setStdIn(proc.getOutputStream());
         this.setStdOut(proc.getInputStream());
