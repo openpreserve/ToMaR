@@ -3,6 +3,7 @@ package eu.scape_project.pt.mapred;
 import eu.scape_project.pt.proc.Processor;
 import eu.scape_project.pt.proc.StreamProcessor;
 import eu.scape_project.pt.proc.ToolProcessor;
+import eu.scape_project.pt.repo.Repository;
 import eu.scape_project.pt.repo.ToolRepository;
 import eu.scape_project.pt.tool.Operation;
 import eu.scape_project.pt.tool.Tool;
@@ -40,7 +41,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
     private static Log LOG = LogFactory.getLog(ToolspecMapper.class);
 
     private CmdLineParser parser;
-    private ToolRepository repo;
+    private Repository repo;
     private Tool tool;
     private Operation operation;
 
