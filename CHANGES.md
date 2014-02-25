@@ -1,3 +1,8 @@
+## 1.4.1
+
+  * ToolProcessor can be configured with respect to the working directory to run the command line tool
+  * Added a condition for Windows. Command lines are not wrapped in "sh -c {command}" on this operation system as sh does not exist there.
+  
 ## 1.4.0
 
   * ToolProcessor now wraps command line executions in "sh -c {command}". This enables ToolSpec authors to use the full range of possible shell command lines.

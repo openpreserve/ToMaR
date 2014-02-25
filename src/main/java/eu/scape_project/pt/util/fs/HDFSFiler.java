@@ -97,7 +97,7 @@ public class HDFSFiler extends Filer {
     }
 
     @Override
-    public void setDirectory(String strDir ) {
+    public void setWorkingDir(String strDir ) {
         LOG.debug("setDirectory " + strDir );
         File dir = new File(strDir);
         if( !dir.isAbsolute() ) {

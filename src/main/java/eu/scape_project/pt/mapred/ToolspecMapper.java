@@ -3,6 +3,7 @@ package eu.scape_project.pt.mapred;
 import eu.scape_project.pt.proc.Processor;
 import eu.scape_project.pt.proc.StreamProcessor;
 import eu.scape_project.pt.proc.ToolProcessor;
+import eu.scape_project.pt.repo.Repository;
 import eu.scape_project.pt.repo.ToolRepository;
 import eu.scape_project.pt.tool.Operation;
 import eu.scape_project.pt.tool.Tool;
@@ -40,7 +41,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
     private static Log LOG = LogFactory.getLog(ToolspecMapper.class);
 
     private CmdLineParser parser;
-    private ToolRepository repo;
+    private Repository repo;
     private Tool tool;
     private Operation operation;
 
@@ -93,7 +94,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
             Map<String, String>[] mapInputFileParameters = new HashMap[commands.length];
             Map<String, String>[] mapOutputFileParameters = new HashMap[commands.length];
 
-            String directory = System.getProperty("user.dir");
+            String workingDir = System.getProperty("user.dir");
             for(int c = 0; c < commands.length; c++ ) {
                 Command command = commands[c];
 
@@ -111,6 +112,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
                 lastProcessor.initialize();
 
                 lastProcessor.setParameters(command.getPairs());
+                lastProcessor.setWorkingDir(workingDir);
 
                 // get parameters accepted by the lastProcessor.
                 mapInputFileParameters[c] = lastProcessor.getInputFileParameters(); 
@@ -129,7 +131,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
                     String localFileRefs = "";
                     for( int i = 0; i < remoteFileRefs.length; i++ ){
                         Filer filer = Filer.create(remoteFileRefs[i]);
-                        filer.setDirectory(directory);
+                        filer.setWorkingDir(workingDir);
                         filer.localize();
                         localFileRefs = localFileRefs + sep + filer.getRelativeFileRef();
                     }
@@ -142,7 +144,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
                     String localFileRefs = "";
                     for( int i = 0; i < remoteFileRefs.length; i++ ){
                         Filer filer = Filer.create(entry.getValue());
-                        filer.setDirectory(directory);
+                        filer.setWorkingDir(workingDir);
                         filer.localize();
                         localFileRefs = localFileRefs + sep + filer.getRelativeFileRef();
                     }
@@ -193,7 +195,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
                     String[] localFileRefs = strFile.split(sep);
                     for( int j = 0; j < localFileRefs.length; j++ ){
                         Filer filer = Filer.create(localFileRefs[j]);
-                        filer.setDirectory(directory);
+                        filer.setWorkingDir(workingDir);
                         filer.delocalize();
                     }
                 }

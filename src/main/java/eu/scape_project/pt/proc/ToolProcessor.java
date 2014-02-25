@@ -7,6 +7,8 @@ import eu.scape_project.pt.tool.Output;
 import eu.scape_project.pt.tool.Parameter;
 import eu.scape_project.pt.tool.Tool;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -54,6 +56,8 @@ public class ToolProcessor extends Processor {
      * Underlying sub-process.
      */
     private Process proc;
+
+    private File workingDir = null;
 
     /**
      * Constructs the processor with a tool and an action of a
@@ -110,9 +114,9 @@ public class ToolProcessor extends Processor {
 
         if( !System.getProperty("os.name").startsWith("Windows")){
             String[] cmd = {"sh", "-c", strCmd};
-            proc = Runtime.getRuntime().exec(cmd);
+            proc = Runtime.getRuntime().exec(cmd, null, this.workingDir);
         } else {
-            proc = Runtime.getRuntime().exec(strCmd);
+            proc = Runtime.getRuntime().exec(strCmd, null, this.workingDir);
         }
 
         this.setStdIn(proc.getOutputStream());
@@ -226,7 +230,7 @@ public class ToolProcessor extends Processor {
     /**
      * Replaces ${key}s in given command strCmd by values.
      */
-	 private String replaceAll(String strCmd, Map<String,String> mapInputs) {
+     private String replaceAll(String strCmd, Map<String,String> mapInputs) {
          if( mapInputs.isEmpty() ) return strCmd;
         // create the pattern wrapping the keys with ${} and join them with '|'
         String regexp = "";
@@ -248,7 +252,7 @@ public class ToolProcessor extends Processor {
 
         return sb.toString();
 
-	}
+    }
 
     /**
      * Maps a parameter name to the placeholder's form.
@@ -264,5 +268,12 @@ public class ToolProcessor extends Processor {
      */
     private String placeholderToParameter( String strVariable ) {
         return strVariable.substring(2, strVariable.length() - 1 );
+    }
+
+    public void setWorkingDir(String workingDir) throws IOException {
+        File dir = new File(workingDir);
+        if( !dir.exists() ) dir.mkdirs();
+        else if( dir.isDirectory() ) throw new IOException("Working directory " + dir + " is not a directory");
+        this.workingDir = dir;
     }
 }
