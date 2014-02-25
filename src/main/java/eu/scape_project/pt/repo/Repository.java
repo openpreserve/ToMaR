@@ -1,5 +1,9 @@
 package eu.scape_project.pt.repo;
 
+import eu.scape_project.pt.tool.Tool;
+
+import java.io.IOException;
+
 /**
  * @author Matthias Rella
  */
@@ -10,5 +14,7 @@ public interface Repository {
      * @return a string array of toolspecs
      */
     public String[] getToolList();
+
+    public Tool getTool(String tool) throws IOException;
 
 }

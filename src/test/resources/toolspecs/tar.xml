@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<tool xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://scape-project.eu/tool tool-1.0_draft.xsd" xmlns="http://scape-project.eu/tool" xmlns:xlink="http://www.w3.org/1999/xlink" schemaVersion="1.0">
-  <operations>
-    <operation name="tar">
-        <description>Tars one file or folder</description>
-        <command>/usr/bin/tar -czf ${output} ${input}</command>
-	<inputs>
-	    <input name="input" required="true">
-	        <description>Reference to input file</description>
-	    </input>
-	</inputs>
-	<outputs>
-	    <output name="output" required="true">
-		<description>Reference to zipped output file</description>
-	    </output>
-	</outputs>
-    </operation>
-  </operations>
+<tool xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://scape-project.eu/tool https://raw2.github.com/openplanets/scape-toolspecs/master/toolspec.xsd"
+    xmlns="http://scape-project.eu/tool" xmlns:xlink="http://www.w3.org/1999/xlink" schemaVersion="1.0" name="tar" version="1.0.1">
+    <operations>
+        <operation name="tar">
+            <description>Tars one file or folder</description>
+            <command>/usr/bin/tar -czf ${output} ${input}</command>
+            <inputs>
+                <input name="input" required="true">
+                    <description>Reference to input file</description>
+                </input>
+            </inputs>
+            <outputs>
+                <output name="output" required="true">
+                    <description>Reference to zipped output file</description>
+                </output>
+            </outputs>
+        </operation>
+    </operations>
 </tool>
 
