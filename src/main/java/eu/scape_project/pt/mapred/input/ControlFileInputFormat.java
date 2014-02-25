@@ -20,12 +20,21 @@ package eu.scape_project.pt.mapred.input;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.hadoop.classification.InterfaceAudience;
 import org.apache.hadoop.classification.InterfaceStability;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -40,6 +49,16 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.LineRecordReader;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.util.LineReader;
+
+import eu.scape_project.pt.tool.Operation;
+import eu.scape_project.pt.tool.Tool;
+import eu.scape_project.pt.util.CmdLineParser;
+import eu.scape_project.pt.util.Command;
+import eu.scape_project.pt.util.PipedArgsParser;
+import eu.scape_project.pt.util.PropertyNames;
+import eu.scape_project.pt.proc.ToolProcessor;
+import eu.scape_project.pt.repo.Repository;
+import eu.scape_project.pt.repo.ToolRepository;
 
 /**
  * NLineInputFormat which splits N lines of input as one split.
@@ -62,123 +81,199 @@ import org.apache.hadoop.util.LineReader;
 @InterfaceAudience.Public
 @InterfaceStability.Stable
 public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> {
-  public static final String LINES_PER_MAP = 
-    "mapreduce.input.lineinputformat.linespermap";
+    public static final String LINES_PER_MAP = 
+        "mapreduce.input.lineinputformat.linespermap";
 
-  public RecordReader<LongWritable, Text> createRecordReader(
-      InputSplit genericSplit, TaskAttemptContext context) 
-      throws IOException {
-    context.setStatus(genericSplit.toString());
-    return new LineRecordReader();
-  }
+    public RecordReader<LongWritable, Text> createRecordReader(
+            InputSplit genericSplit, TaskAttemptContext context) 
+        throws IOException {
+        context.setStatus(genericSplit.toString());
+        return new LineRecordReader();
+            }
 
-  /** 
-   * Logically splits the set of input files for the job, splits N lines
-   * of the input as one split.
-   * 
-   * @see FileInputFormat#getSplits(JobContext)
-   */
-  public List<InputSplit> getSplits(JobContext job)
-  throws IOException {
-    List<InputSplit> splits = new ArrayList<InputSplit>();
-    int numLinesPerSplit = getNumLinesPerSplit(job);
-    for (FileStatus status : listStatus(job)) {
-      splits.addAll(getSplitsForFile(status,
-        job.getConfiguration(), numLinesPerSplit));
-    }
-    return splits;
-  }
-  
-  public static List<FileSplit> getSplitsForFile(FileStatus status,
-      Configuration conf, int numLinesPerSplit) throws IOException {
-    List<FileSplit> splits = new ArrayList<FileSplit> ();
-    Path fileName = status.getPath();
-    if (status.isDir()) {
-      throw new IOException("Not a file: " + fileName);
-    }
-    FileSystem  fs = fileName.getFileSystem(conf);
-    LineReader lr = null;
-    try {
-      FSDataInputStream in  = fs.open(fileName);
-      lr = new LineReader(in, conf);
-      Text line = new Text();
-      int numLines = 0;
-      long begin = 0;
-      long length = 0;
-      int num = -1;
-      while ((num = lr.readLine(line)) > 0) {
-        // read line by line
-        // parse it, read input file parameters
-        // put lines with same primary location in the same array
-        // check whether the arrays are balanced
-        // foreach overbalanced array, go through files, look at secondary location and if the secondary location array is lessbalanced put it there. If not, look at tertiary, quartary ...
-        // x = arraysize / N ... number of splits
-        // r = x - int(x) ... fraction of rest
-        // b = (int)(N*r) ... number of rest
-        // a = b/int(x) ... number of lines per split to add
-        // i = 0; j = 0; start = 0
-        // if arraysize < N
-        //   put all lines into newControlFile and use the whole as a split
-        // else
-        // foreach line in array
-        //   put it into newControlFile
-        //   increase byteCounter by line length
-        //   if i < N + int(j) 
-        //     increase i
-        //   else
-        //     new Split(newControlfile, start, byteCounter, location of array)
-        //     if( int(j) = 0)
-        //       increate j by a
-        //     else
-        //       j -= int(j)
-        //     i = 0
-        //     start = byteCounter +1;
-        numLines++;
-        length += num;
-        if (numLines == numLinesPerSplit) {
-          // NLineInputFormat uses LineRecordReader, which always reads
-          // (and consumes) at least one character out of its upper split
-          // boundary. So to make sure that each mapper gets N lines, we
-          // move back the upper split limits of each split 
-          // by one character here.
-          if (begin == 0) {
-            splits.add(new FileSplit(fileName, begin, length - 1,
-              new String[] {}));
-          } else {
-            splits.add(new FileSplit(fileName, begin - 1, length,
-              new String[] {}));
-          }
-          begin += length;
-          length = 0;
-          numLines = 0;
+    /** 
+     * Logically splits the set of input files for the job, splits N lines
+     * of the input as one split.
+     * 
+     * @see FileInputFormat#getSplits(JobContext)
+     */
+    public List<InputSplit> getSplits(JobContext job)
+        throws IOException {
+        List<InputSplit> splits = new ArrayList<InputSplit>();
+        int numLinesPerSplit = getNumLinesPerSplit(job);
+        for (FileStatus status : listStatus(job)) {
+            splits.addAll(getSplitsForFile(status,
+                        job.getConfiguration(), numLinesPerSplit));
         }
-      }
-      if (numLines != 0) {
-        splits.add(new FileSplit(fileName, begin, length, new String[]{}));
-      }
-    } finally {
-      if (lr != null) {
-        lr.close();
-      }
+        return splits;
     }
-    return splits; 
-  }
-  
-  /**
-   * Set the number of lines per split
-   * @param job the job to modify
-   * @param numLines the number of lines per split
-   */
-  public static void setNumLinesPerSplit(Job job, int numLines) {
-    job.getConfiguration().setInt(LINES_PER_MAP, numLines);
-  }
 
-  /**
-   * Get the number of lines per split
-   * @param job the job
-   * @return the number of lines per split
-   */
-  public static int getNumLinesPerSplit(JobContext job) {
-    return job.getConfiguration().getInt(LINES_PER_MAP, 1);
-  }
+    public static List<FileSplit> getSplitsForFile(FileStatus status,
+            Configuration conf, int numLinesPerSplit) throws IOException {
+        List<FileSplit> splits = new ArrayList<FileSplit> ();
+        Path fileName = status.getPath();
+        if (status.isDir()) {
+            throw new IOException("Not a file: " + fileName);
+        }
+        FileSystem  fs = fileName.getFileSystem(conf);
+        LineReader lr = null;
+        try {
+            FSDataInputStream in  = fs.open(fileName);
+            lr = new LineReader(in, conf);
+            Text controlLine = new Text();
+            int numLines = 0;
+            long begin = 0;
+            long length = 0;
+            int num = -1;
+            CmdLineParser parser = new PipedArgsParser();
+            String strRepo = conf.get(PropertyNames.REPO_LOCATION);
+            Path fRepo = new Path(strRepo);
+            Repository repo = new ToolRepository(fs, fRepo);
+            Map<String, ArrayList<String>> locationMap = new HashMap<String, ArrayList<String>>();
+            float l = 0;
+            while ((num = lr.readLine(controlLine)) > 0) {
+                l+=1;
+                // read line by line
+                parser.parse(controlLine.toString());
+
+                Command command = parser.getCommands()[0];
+                String strStdinFile = parser.getStdinFile();
+                // parse it, read input file parameters
+                Tool tool = repo.getTool(command.getTool());
+
+                ToolProcessor proc = new ToolProcessor(tool);
+                Operation operation = proc.findOperation(command.getAction());
+                if( operation == null )
+                    throw new IOException(
+                            "operation " + command.getAction() + " not found");
+
+                proc.setOperation(operation);
+                proc.setParameters(command.getPairs());
+                Map<String, String> mapInputFileParameters = proc.getInputFileParameters(); 
+                Path[] inFiles;
+                int i = 0;
+                if( strStdinFile != null ) {
+                    inFiles = new Path[mapInputFileParameters.size()+1];
+                    Path p = new Path(strStdinFile);
+                    if( fs.exists(p) ) {
+                        inFiles[i++] = p;
+                    }
+                } else {
+                    inFiles = new Path[mapInputFileParameters.size()];
+                }
+
+                for( String fileRef : mapInputFileParameters.values() ) {
+                    Path p = new Path(fileRef);
+                    if( fs.exists(p) ) {
+                        inFiles[i++] = p;
+                    }
+                }
+
+                // count for each host how many blocks it holds of the current control line's input files
+                final Map<String, Integer> hostMap = new HashMap<String, Integer>();
+                for( Path inFile : inFiles ) {
+                    FileStatus s = fs.getFileStatus(inFile);
+                    BlockLocation[] locations = fs.getFileBlockLocations(s, (long)0, s.getLen());
+                    for( BlockLocation location : locations ) {
+                        String[] hosts = location.getHosts();
+                        for( String host : hosts ) {
+                            if( !hostMap.containsKey(host) ) {
+                                hostMap.put(host, 1);
+                                continue;
+                            }
+                            hostMap.put(host, hostMap.get(host)+1);
+                        }
+                    }
+                }
+                // sort hosts by number of references to blocks of input files
+                List<String> hosts = new ArrayList<String>();
+                hosts.addAll(hostMap.keySet());
+                Collections.sort(hosts, new Comparator<String>() {
+                    public int compare(String host1, String host2) {
+                        return hostMap.get(host1) - hostMap.get(host2);
+                    }
+                });
+
+
+                for(String host : hosts ) {
+                    ArrayList<String> lines = locationMap.get(host);
+                    // if the location is unbalanced (got too few lines) add line for that location
+                    if( lines.size() * hosts.size() / l <= 1 ) {
+                        lines.add(controlLine.toString());
+                        locationMap.put(host, lines);
+                    }
+                }
+            }
+
+            Path newControlFile = new Path(fileName + "-rearranged" + System.currentTimeMillis() );
+            FSDataOutputStream fsout = fs.create(newControlFile);
+            int start = 0, byteCounter = 0; 
+
+            for( Entry<String, ArrayList<String>> entry : locationMap.entrySet() ) { // if arraysize < N
+                String host = entry.getKey();
+                ArrayList<String> lines = entry.getValue();
+                float x = lines.size() / numLinesPerSplit;
+                float r = x - (int)x;
+                float b = (int)(numLinesPerSplit * r);
+                float a = b / (int)x;
+                // x = arraysize / N ... number of splits
+                // r = x - int(x) ... fraction of rest
+                // b = (int)(N*r) ... number of rest
+                // a = b/int(x) ... number of lines per split to add
+                // i = 0; j = 0; start = 0
+                if( lines.size() <= numLinesPerSplit ) {
+                    //   put all lines into newControlFile and use the whole as a split
+                    for( String line : lines ) {
+                        fsout.writeChars(line); // FIXME : add a line break?
+                        byteCounter += line.length();
+                    }
+                    splits.add(new FileSplit(newControlFile, start, byteCounter, new String[]{host}));
+                } else {
+                    int i = 0; 
+                    float j = 0;
+                    for( String line : lines ) {
+                        fsout.writeChars(line);
+                        byteCounter += line.length();
+                        if( i < numLinesPerSplit + (int)j ) {
+                            i++;
+                        } else {
+                            splits.add(new FileSplit(newControlFile, start, byteCounter, new String[]{host}));
+                            if( (int)j == 0 ) {
+                                j += a;
+                            } else {
+                                j -= (int)j;
+                            }
+                            i = 0;
+                        }
+                    }
+                }
+                start = byteCounter + 1;
+            }
+            fsout.close();
+
+        } finally {
+            if (lr != null) {
+                lr.close();
+            }
+        }
+        return splits; 
+    }
+
+    /**
+     * Set the number of lines per split
+     * @param job the job to modify
+     * @param numLines the number of lines per split
+     */
+    public static void setNumLinesPerSplit(Job job, int numLines) {
+        job.getConfiguration().setInt(LINES_PER_MAP, numLines);
+    }
+
+    /**
+     * Get the number of lines per split
+     * @param job the job
+     * @return the number of lines per split
+     */
+    public static int getNumLinesPerSplit(JobContext job) {
+        return job.getConfiguration().getInt(LINES_PER_MAP, 1);
+    }
 }
