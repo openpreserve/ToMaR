@@ -17,6 +17,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -167,7 +169,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
             text = convertToResult(oStdout, strStdoutFile);
 
         } catch (Exception ex) {
-            LOG.error(ex);
+            LOG.error("error during mapping", ex);
             text = convertToResult(ex);
         } finally {
             writeMappingResult(key, text, context);
@@ -194,7 +196,9 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
     }
 
     private Text convertToResult(Exception ex) {
-        return new Text( "ERROR: " + ex.getMessage() );
+        StringWriter writer = new StringWriter();
+        ex.printStackTrace(new PrintWriter(writer));
+        return new Text( "ERROR: " + writer.toString() );
     }
 
     private OutputStream createStdOut(final String strStdoutFile) throws IOException {
@@ -240,7 +244,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
         try {
             context.write( key, text);
         } catch (InterruptedException ex) {
-            LOG.error(ex);
+            LOG.error("error during write", ex);
             throw new IOException(ex);
         }
     }
