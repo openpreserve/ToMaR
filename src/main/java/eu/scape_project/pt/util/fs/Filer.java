@@ -43,7 +43,7 @@ public abstract class Filer {
     /**
      * Sets the working directory where to localize remote files or directories to.
      */
-    public abstract void setDirectory(String strDir ) throws IOException;
+    public abstract void setWorkingDir(String strDir ) throws IOException;
 
     /**
      * Copies file or directory to local filesystem.
