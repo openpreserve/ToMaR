@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,18 +25,14 @@ import org.apache.hadoop.mapreduce.Mapper;
  * Executes a Taverna workflow using the Taverna shell script from the installation.
  * 
  * @author Martin Schenck [schenck]
- *
  */
 public class TavernaMapper extends Mapper<LongWritable, Text, LongWritable, Text> {
-    private static Log LOG = LogFactory.getLog(TavernaMapper.class);
+    private final Log LOG = LogFactory.getLog(getClass());
     
     // Locations of the Taverna installation and the workflow
     private String tavernaHome;
     private String workflowLocation;
     private String resultOutDir;
-    
-    // Taverna output directory
-    private String tavernaOutput;
     
     @Override
     public void setup(Context context) {
@@ -136,14 +131,9 @@ public class TavernaMapper extends Mapper<LongWritable, Text, LongWritable, Text
             String line;
             while((line = bufferedStream.readLine()) != null) {
                 LOG.info("Taverna: " + line);
-                
-                // Get Taverna output directory
-                if(line.startsWith("Outputs will be saved to the directory:"))
-                    tavernaOutput = line.substring(40);
             }
         } catch (IOException e) {
-            LOG.error("Error while outputting stream from Taverna process.");
-            e.printStackTrace();
+            LOG.error("Error while outputting stream from Taverna process.", e);
         } finally {
             try { bufferedStream.close(); } catch (Exception e) { /* ignore */ }
         }
