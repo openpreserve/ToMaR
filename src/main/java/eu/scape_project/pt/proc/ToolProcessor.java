@@ -118,7 +118,7 @@ public class ToolProcessor extends Processor {
         } else {
             cmd = {"sh", "-c", strCmd};
         }
-        proc = Runtime.getRuntime().exec(strCmd, null, this.workingDir);
+        proc = Runtime.getRuntime().exec(cmd, null, this.workingDir);
 
         this.setStdIn(proc.getOutputStream());
         this.setStdOut(proc.getInputStream());
