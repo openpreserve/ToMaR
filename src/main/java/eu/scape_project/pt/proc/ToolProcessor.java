@@ -112,12 +112,13 @@ public class ToolProcessor extends Processor {
         String strCmd = replaceAll(this.operation.getCommand(), allInputs);
         LOG.debug("strCmd = " + strCmd );
 
-        if( !System.getProperty("os.name").startsWith("Windows")){
-            String[] cmd = {"sh", "-c", strCmd};
-            proc = Runtime.getRuntime().exec(cmd, null, this.workingDir);
+        String[] cmd;
+        if( System.getProperty("os.name").startsWith("Windows")){
+            cmd = {"cmd.exe", "/C", strCmd};
         } else {
-            proc = Runtime.getRuntime().exec(strCmd, null, this.workingDir);
+            cmd = {"sh", "-c", strCmd};
         }
+        proc = Runtime.getRuntime().exec(strCmd, null, this.workingDir);
 
         this.setStdIn(proc.getOutputStream());
         this.setStdOut(proc.getInputStream());
