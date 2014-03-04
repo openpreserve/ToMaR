@@ -21,7 +21,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.ToolRunner;
 
-import org.apache.hadoop.mapreduce.lib.input.NLineInputFormat;
+import eu.scape_project.pt.mapred.input.ControlFileInputFormat;
 
 /**
  * A command-line interaction wrapper to execute cmd-line tools with MapReduce.
@@ -57,8 +57,8 @@ public class CLIWrapper extends Configured implements org.apache.hadoop.util.Too
             job.setMapperClass(ToolspecMapper.class);
         }
         
-        job.setInputFormatClass(NLineInputFormat.class);
-        NLineInputFormat.setNumLinesPerSplit(
+        job.setInputFormatClass(ControlFileInputFormat.class);
+        ControlFileInputFormat.setNumLinesPerSplit(
             job, 
             Integer.parseInt(conf.get(PropertyNames.NUM_LINES_PER_SPLIT)));
         
