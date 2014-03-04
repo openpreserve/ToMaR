@@ -114,9 +114,9 @@ public class ToolProcessor extends Processor {
 
         String[] cmd;
         if( System.getProperty("os.name").startsWith("Windows")){
-            cmd = {"cmd.exe", "/C", strCmd};
+            cmd = new String[]{"cmd.exe", "/C", strCmd};
         } else {
-            cmd = {"sh", "-c", strCmd};
+            cmd = new String[]{"sh", "-c", strCmd};
         }
         proc = Runtime.getRuntime().exec(cmd, null, this.workingDir);
 
