@@ -215,7 +215,7 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
             Path[] inFiles = getInputFiles(fs, parser, repo, controlLine.toString());
 
             // count for each host how many blocks it holds of the current control line's input files
-            String[] hosts = getHosts(fs, inFiles);
+            String[] hosts = getSortedHosts(fs, inFiles);
 
             LOG.debug("hosts.size = " + hosts.length);
             for (String host : hosts) {
@@ -265,6 +265,7 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
         }
 
         for (String fileRef : mapInputFileParameters.values()) {
+            LOG.debug("fileRef = " + fileRef );
             Path p = new Path(fileRef);
             if (fs.exists(p)) {
                 inFiles[i++] = p;
@@ -273,7 +274,7 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
         return inFiles;
     }
 
-    public static String[] getHosts(FileSystem fs, Path[] inFiles)
+    public static String[] getSortedHosts(FileSystem fs, Path[] inFiles)
             throws IOException {
         final Map<String, Integer> hostMap = new HashMap<String, Integer>();
         for( Path inFile : inFiles ) {
@@ -298,7 +299,7 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
         hosts.addAll(hostMap.keySet());
         Collections.sort(hosts, new Comparator<String>() {
             public int compare(String host1, String host2) {
-                return hostMap.get(host1) - hostMap.get(host2);
+                return hostMap.get(host2) - hostMap.get(host1);
             }
         });
         return hosts.toArray(new String[0]);
