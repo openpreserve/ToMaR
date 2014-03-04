@@ -60,6 +60,9 @@ import eu.scape_project.pt.proc.ToolProcessor;
 import eu.scape_project.pt.repo.Repository;
 import eu.scape_project.pt.repo.ToolRepository;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * NLineInputFormat which splits N lines of input as one split.
  *
@@ -81,6 +84,7 @@ import eu.scape_project.pt.repo.ToolRepository;
 @InterfaceAudience.Public
 @InterfaceStability.Stable
 public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> {
+    private static Log LOG = LogFactory.getLog(ControlFileInputFormat.class);
     public static final String LINES_PER_MAP = 
         "mapreduce.input.lineinputformat.linespermap";
 
@@ -112,6 +116,7 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
             Configuration conf, int numLinesPerSplit) throws IOException {
         List<FileSplit> splits = new ArrayList<FileSplit> ();
         Path fileName = status.getPath();
+        LOG.debug("fileName = " + fileName.toString());
         if (status.isDir()) {
             throw new IOException("Not a file: " + fileName);
         }
@@ -121,6 +126,7 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
             FSDataInputStream in  = fs.open(fileName);
             lr = new LineReader(in, conf);
             Text controlLine = new Text();
+            LOG.debug("read controlLine = " + controlLine.toString());
             int numLines = 0;
             long begin = 0;
             long length = 0;
@@ -133,6 +139,7 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
             float l = 0;
             while ((num = lr.readLine(controlLine)) > 0) {
                 l+=1;
+                LOG.debug("l = " + l );
                 // read line by line
                 parser.parse(controlLine.toString());
 
@@ -172,11 +179,14 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
                 // count for each host how many blocks it holds of the current control line's input files
                 final Map<String, Integer> hostMap = new HashMap<String, Integer>();
                 for( Path inFile : inFiles ) {
+                    LOG.debug("inFile = " + inFile.toString());
                     FileStatus s = fs.getFileStatus(inFile);
                     BlockLocation[] locations = fs.getFileBlockLocations(s, (long)0, s.getLen());
                     for( BlockLocation location : locations ) {
                         String[] hosts = location.getHosts();
+                        LOG.debug("  one blockLocation on: ");
                         for( String host : hosts ) {
+                            LOG.debug("    host = " + host);
                             if( !hostMap.containsKey(host) ) {
                                 hostMap.put(host, 1);
                                 continue;
@@ -195,10 +205,14 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
                 });
 
 
+                LOG.debug("hosts.size = " + hosts.size() );
                 for(String host : hosts ) {
-                    ArrayList<String> lines = locationMap.get(host);
+                    ArrayList<String> lines = locationMap.containsKey(host) ? 
+                        locationMap.get(host) : new ArrayList<String>();
                     // if the location is unbalanced (got too few lines) add line for that location
+                    LOG.debug("lines.size = " + lines.size() );
                     if( lines.size() * hosts.size() / l <= 1 ) {
+                        LOG.debug("host is unbalanced, adding line to it");
                         lines.add(controlLine.toString());
                         locationMap.put(host, lines);
                     }
@@ -206,38 +220,49 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
             }
 
             Path newControlFile = new Path(fileName + "-rearranged" + System.currentTimeMillis() );
+            LOG.debug("newControlFile = " + newControlFile.toString());
             FSDataOutputStream fsout = fs.create(newControlFile);
             int start = 0, byteCounter = 0; 
 
-            for( Entry<String, ArrayList<String>> entry : locationMap.entrySet() ) { // if arraysize < N
+            for( Entry<String, ArrayList<String>> entry : locationMap.entrySet() ) { 
                 String host = entry.getKey();
+                LOG.debug(" for host = " + host );
                 ArrayList<String> lines = entry.getValue();
                 float x = lines.size() / numLinesPerSplit;
                 float r = x - (int)x;
                 float b = (int)(numLinesPerSplit * r);
                 float a = b / (int)x;
+                LOG.debug(" x = " + x + ", r = " + r + ", b = " + b + ", a = " + a );
                 // x = arraysize / N ... number of splits
                 // r = x - int(x) ... fraction of rest
                 // b = (int)(N*r) ... number of rest
                 // a = b/int(x) ... number of lines per split to add
                 // i = 0; j = 0; start = 0
+                
+                // if arraysize < N
                 if( lines.size() <= numLinesPerSplit ) {
+                    LOG.debug("arraysize < N ");
                     //   put all lines into newControlFile and use the whole as a split
                     for( String line : lines ) {
                         fsout.writeChars(line); // FIXME : add a line break?
                         byteCounter += line.length();
                     }
                     splits.add(new FileSplit(newControlFile, start, byteCounter, new String[]{host}));
+                    LOG.debug("split created, start = " + start + ", end = " + byteCounter + ", host = " + host );
                 } else {
+                    LOG.debug("arraysize > N");
                     int i = 0; 
                     float j = 0;
                     for( String line : lines ) {
+                        LOG.debug("writing line to newControlFile");
+                        LOG.debug("line = " + line );
                         fsout.writeChars(line);
                         byteCounter += line.length();
                         if( i < numLinesPerSplit + (int)j ) {
                             i++;
                         } else {
                             splits.add(new FileSplit(newControlFile, start, byteCounter, new String[]{host}));
+                            LOG.debug("split created, start = " + start + ", end = " + byteCounter + ", host = " + host );
                             if( (int)j == 0 ) {
                                 j += a;
                             } else {
