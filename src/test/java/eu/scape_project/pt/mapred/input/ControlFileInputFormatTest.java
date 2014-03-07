@@ -16,17 +16,26 @@
 package eu.scape_project.pt.mapred.input;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -82,7 +91,7 @@ public class ControlFileInputFormatTest {
             new BlockLocation(null, new String[]{"hostA"}, 0, 0)
         });
         fs.addFile(pInputFile3.toString(), true, new BlockLocation[]{
-            new BlockLocation(null, new String[]{"hostA", "hostC"}, 0, 0)
+            new BlockLocation(null, new String[]{"hostA"}, 0, 0)
         });
         String[] hosts = ControlFileInputFormat.getSortedHosts(fs, new Path[]{
             pInputFile1,
@@ -90,11 +99,179 @@ public class ControlFileInputFormatTest {
             pInputFile3
         });
 
+        int i = 1;
+        for( String host : hosts ) {
+            LOG.debug(i++ + ". Host = " + host);
+        }
+
         assertEquals(new String[]{
             "hostA",
             "hostB",
             "hostC"
         }, hosts );
+
+    }
+
+    @Test
+    public void testAddToLocationMap() throws Exception {
+        Map<String, ArrayList<String>> locationMap = new HashMap<String, ArrayList<String>>();
+        String[] hosts = {"hostA", "hostB", "hostC"};
+
+        int l = 0;
+        ControlFileInputFormat.addToLocationMap(locationMap, hosts, "line1", ++l );
+        Map<String, ArrayList<String>> expectedMap = new HashMap<String, ArrayList<String>>(){{
+            put("hostA", new ArrayList<String>(){{
+                add("line1");
+            }});
+        }};
+        assertEquals(expectedMap, locationMap);
+
+        ControlFileInputFormat.addToLocationMap(locationMap, hosts, "line2", ++l );
+        expectedMap.put("hostB", new ArrayList<String>(){{
+            add("line2");
+        }});
+        assertEquals(expectedMap, locationMap);
+
+        ControlFileInputFormat.addToLocationMap(locationMap, hosts, "line3", ++l );
+        expectedMap.put("hostC", new ArrayList<String>(){{
+            add("line3");
+        }});
+        assertEquals(expectedMap, locationMap);
+
+        ControlFileInputFormat.addToLocationMap(locationMap, hosts, "line4", ++l );
+        expectedMap.get("hostA").add("line4");
+        assertEquals(expectedMap, locationMap);
+
+        ControlFileInputFormat.addToLocationMap(locationMap, hosts, "line5", ++l );
+        expectedMap.get("hostB").add("line5");
+        assertEquals(expectedMap, locationMap);
+
+        ControlFileInputFormat.addToLocationMap(locationMap, hosts, "line6", ++l );
+        expectedMap.get("hostC").add("line6");
+        assertEquals(expectedMap, locationMap);
+    }
+
+    @Test
+    public void testWriteNewControlFileAndCreateSplits() throws Exception {
+        MockupFileSystem fs = new MockupFileSystem();
+        Path newControlFile = new Path("newControlFile");
+        fs.addFile("newControlFile", true, null);
+        Map<String, ArrayList<String>> locationMap = new HashMap<String, ArrayList<String>>(){{
+            put("host1", new ArrayList<String>(){{
+                add("line1-1\n");
+                add("line1-2\n");
+                add("line1-3\n");
+            }});
+            put("host2", new ArrayList<String>(){{
+                add("line2-1\n");
+                add("line2-2\n");
+                add("line2-3\n");
+                add("line2-4\n");
+                add("line2-5\n");
+                add("line2-6\n");
+            }});
+            put("host3", new ArrayList<String>(){{
+                add("line3-1\n");
+                add("line3-2\n");
+                add("line3-3\n");
+                add("line3-4\n");
+                add("line3-5\n");
+                add("line3-6\n");
+                add("line3-7\n");
+                add("line3-8\n");
+            }});
+            put("host4", new ArrayList<String>(){{
+                add("line4-1\n");
+                add("line4-2\n");
+                add("line4-3\n");
+                add("line4-4\n");
+                add("line4-5\n");
+                add("line4-6\n");
+                add("line4-7\n");
+                add("line4-8\n");
+                add("line4-9\n");
+                add("line4-10\n");
+            }});
+        }};
+        List<FileSplit> splits = ControlFileInputFormat.writeNewControlFileAndCreateSplits(
+                newControlFile, fs, locationMap, 3);
+
+        FSDataInputStream bis = fs.open(newControlFile);
+        int i = 0;
+        for( FileSplit split : splits ) {
+            LOG.debug(++i + ".split = " + split.toString());
+            byte[] content = new byte[(int)split.getLength()];
+            bis.read((int)split.getStart(), content, 0, (int)split.getLength());
+            String cont = new String(content);
+            LOG.debug("  content = " + new String(content));
+            if( cont.startsWith("line1-1") ) {
+                String expected = "";
+                for( String line : locationMap.get("host1") ) {
+                    expected += line;
+                }
+                assertEquals(expected, cont);
+            } else if( cont.startsWith("line2-1") ) {
+                String expected = "";
+                int j = 0;
+                for( String line : locationMap.get("host2") ) {
+                    expected += line;
+                    if( ++j == 3 ) break;
+                }
+                assertEquals(expected, cont);
+            } else if( cont.startsWith("line2-4") ) {
+                String expected = "";
+                int j = 0;
+                for( String line : locationMap.get("host2") ) {
+                    if( ++j <= 3 ) continue;
+                    expected += line;
+                }
+                assertEquals(expected, cont);
+            } else if( cont.startsWith("line3-1") ) {
+                String expected = "";
+                int j = 0;
+                for( String line : locationMap.get("host3") ) {
+                    expected += line;
+                    if( ++j == 4 ) break;
+                }
+                assertEquals(expected, cont);
+            } else if( cont.startsWith("line3-5") ) {
+                String expected = "";
+                int j = 0;
+                for( String line : locationMap.get("host3") ) {
+                    if( ++j <= 4 ) continue;
+                    expected += line;
+                }
+                assertEquals(expected, cont);
+            } else if( cont.startsWith("line4-1") ) {
+                String expected = "";
+                int j = 0;
+                for( String line : locationMap.get("host4") ) {
+                    expected += line;
+                    if( ++j == 3 ) break;
+                }
+                assertEquals(expected, cont);
+            } else if( cont.startsWith("line4-4") ) {
+                String expected = "";
+                int j = 0;
+                for( String line : locationMap.get("host4") ) {
+                    if( ++j <= 3 ) continue;
+                    expected += line;
+                    if( ++j > 7  ) break;
+                }
+                assertEquals(expected, cont);
+            } else if( cont.startsWith("line4-7") ) {
+                String expected = "";
+                int j = 0;
+                for( String line : locationMap.get("host4") ) {
+                    if( ++j <= 6 ) continue;
+                    expected += line;
+                }
+                assertEquals(expected, cont);
+            } else {
+                fail("wrong split");
+            }
+        }
+
 
     }
 }

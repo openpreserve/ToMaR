@@ -129,73 +129,87 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
             Path newControlFile = new Path(fileName + "-rearranged"
                     + System.currentTimeMillis());
             LOG.debug("newControlFile = " + newControlFile.toString());
-            FSDataOutputStream fsout = fs.create(newControlFile);
-            int start = 0, byteCounter = 0;
 
-            for (Entry<String, ArrayList<String>> entry : locationMap
-                    .entrySet()) {
-                String host = entry.getKey();
-                LOG.debug(" for host = " + host);
-                ArrayList<String> lines = entry.getValue();
-                float x = lines.size() / numLinesPerSplit;
-                float r = x - (int) x;
-                float b = (int) (numLinesPerSplit * r);
-                float a = b / (int) x;
-                LOG.debug(" x = " + x + ", r = " + r + ", b = " + b + ", a = "
-                        + a);
-                // x = arraysize / N ... number of splits
-                // r = x - int(x) ... fraction of rest
-                // b = (int)(N*r) ... number of rest
-                // a = b/int(x) ... number of lines per split to add
-                // i = 0; j = 0; start = 0
-
-                // if arraysize < N
-                if (lines.size() <= numLinesPerSplit) {
-                    LOG.debug("arraysize < N ");
-                    //   put all lines into newControlFile and use the whole as a split
-                    for (String line : lines) {
-                        fsout.writeChars(line); // FIXME : add a line break?
-                        byteCounter += line.length();
-                    }
-                    splits.add(new FileSplit(newControlFile, start,
-                            byteCounter, new String[] { host }));
-                    LOG.debug("split created, start = " + start + ", end = "
-                            + byteCounter + ", host = " + host);
-                } else {
-                    LOG.debug("arraysize > N");
-                    int i = 0;
-                    float j = 0;
-                    for (String line : lines) {
-                        LOG.debug("writing line to newControlFile");
-                        LOG.debug("line = " + line);
-                        fsout.writeChars(line);
-                        byteCounter += line.length();
-                        if (i < numLinesPerSplit + (int) j) {
-                            i++;
-                        } else {
-                            splits.add(new FileSplit(newControlFile, start,
-                                    byteCounter, new String[] { host }));
-                            LOG.debug("split created, start = " + start
-                                    + ", end = " + byteCounter + ", host = "
-                                    + host);
-                            if ((int) j == 0) {
-                                j += a;
-                            } else {
-                                j -= (int) j;
-                            }
-                            i = 0;
-                        }
-                    }
-                }
-                start = byteCounter + 1;
-            }
-            fsout.close();
+            splits = writeNewControlFileAndCreateSplits(newControlFile, fs, locationMap,
+                    numLinesPerSplit);
 
         } finally {
             if (lr != null) {
                 lr.close();
             }
         }
+        return splits;
+    }
+
+    public static List<FileSplit> writeNewControlFileAndCreateSplits(
+            Path newControlFile, FileSystem fs,
+            Map<String, ArrayList<String>> locationMap, int numLinesPerSplit)
+            throws IOException {
+        int start = 0, byteCounter = 0;
+        List<FileSplit> splits = new ArrayList<FileSplit>();
+        FSDataOutputStream fsout = fs.create(newControlFile);
+        LOG.debug("numLinesPerSplit = " + numLinesPerSplit);
+        for (Entry<String, ArrayList<String>> entry : locationMap
+                .entrySet()) {
+            String host = entry.getKey();
+            LOG.debug(" for host = " + host);
+            ArrayList<String> lines = entry.getValue();
+            int numSplits = lines.size() / numLinesPerSplit;
+            int rest = lines.size() % numLinesPerSplit;
+            double restPerSplit = rest / (double)numSplits;
+            LOG.debug(" numSplits = " + numSplits);
+            LOG.debug(" rest = " + rest);
+            LOG.debug(" restPerSplit = " + restPerSplit);
+            // x = arraysize / N ... number of splits
+            // r = x - int(x) ... fraction of rest
+            // b = (int)(N*r) ... number of rest
+            // a = b/int(x) ... number of lines per split to add
+            // i = 0; j = 0; start = 0
+
+            // if arraysize < N
+            if (lines.size() <= numLinesPerSplit) {
+                LOG.debug("arraysize < N ");
+                //   put all lines into newControlFile and use the whole as a split
+                LOG.debug("writing all lines to newControlFile");
+                for (String line : lines) {
+                    LOG.debug("line = " + line);
+                    fsout.write(line.getBytes()); // FIXME : add a line break?
+                    byteCounter += line.length();
+                }
+                splits.add(new FileSplit(newControlFile, start,
+                        byteCounter-start, new String[] { host }));
+                LOG.debug("split created, start = " + start + ", end = "
+                        + (byteCounter-start) + ", host = " + host);
+                start = byteCounter;
+            } else {
+                LOG.debug("arraysize > N");
+                int i = 1;
+                int j = rest;
+                for (String line : lines) {
+                    LOG.debug("i = " + i + ", j = " + j );
+                    LOG.debug("writing line to newControlFile");
+                    LOG.debug("line = " + line);
+                    fsout.write(line.getBytes());
+                    byteCounter += line.length();
+                    if (i < numLinesPerSplit + (j/numSplits)) {
+                        i++;
+                    } else {
+                        splits.add(new FileSplit(newControlFile, start,
+                                (byteCounter-start), new String[] { host }));
+                        LOG.debug("split created, start = " + start
+                                + ", length = " + (byteCounter-start) + ", host = "
+                                + host);
+                        start = byteCounter;
+                        if ( j >= numSplits ) {
+                            j = numSplits % rest;
+                        }
+                        j += rest;
+                        i = 1;
+                    }
+                }
+            }
+        }
+        fsout.close();
         return splits;
     }
 
@@ -207,7 +221,7 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
         LineReader lr = new LineReader(in, conf);
         Text controlLine = new Text();
         Map<String, ArrayList<String>> locationMap = new HashMap<String, ArrayList<String>>();
-        float l = 0;
+        int l = 0;
         while ((lr.readLine(controlLine)) > 0) {
             l += 1;
             LOG.debug("l = " + l);
@@ -217,20 +231,28 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
             // count for each host how many blocks it holds of the current control line's input files
             String[] hosts = getSortedHosts(fs, inFiles);
 
-            LOG.debug("hosts.size = " + hosts.length);
-            for (String host : hosts) {
-                ArrayList<String> lines = locationMap.containsKey(host) ? locationMap
-                        .get(host) : new ArrayList<String>();
-                // if the location is unbalanced (got too few lines) add line for that location
-                LOG.debug("lines.size = " + lines.size());
-                if (lines.size() * hosts.length / l <= 1) {
-                    LOG.debug("host is unbalanced, adding line to it");
-                    lines.add(controlLine.toString());
-                    locationMap.put(host, lines);
-                }
-            }
+            addToLocationMap(locationMap, hosts, controlLine.toString(), l);
         }
         return locationMap;
+    }
+
+    public static void addToLocationMap(
+        Map<String, ArrayList<String>> locationMap, String[] hosts,
+        String line, int lineNum) {
+        LOG.debug("hosts.size = " + hosts.length);
+        for (String host : hosts) {
+            LOG.debug("  host = " + host);
+            ArrayList<String> lines = locationMap.containsKey(host) ? locationMap
+                    .get(host) : new ArrayList<String>();
+            // if the location is unbalanced (got too few lines) add line for that location
+            LOG.debug("  lines.size = " + lines.size());
+            if (lines.size() < (float)lineNum / hosts.length ) {
+                LOG.debug("  host is unbalanced, adding line to it");
+                lines.add(line);
+                locationMap.put(host, lines);
+                break;
+            }
+        }
     }
 
     public static Path[] getInputFiles(FileSystem fs, CmdLineParser parser,
@@ -264,6 +286,7 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
             inFiles = new Path[mapInputFileParameters.size()];
         }
 
+        // TODO traverse directories
         for (String fileRef : mapInputFileParameters.values()) {
             LOG.debug("fileRef = " + fileRef );
             Path p = new Path(fileRef);
