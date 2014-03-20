@@ -20,7 +20,7 @@ fi
 
 homedir=hdfs:///user/$USER/
 
-for i in `hdfs dfs -ls $inputdir | awk '/hadoop/ {print $8}'`; do
+for i in `hdfs dfs -ls $inputdir | awk '$NF~8 {print $8}'`; do
     o=`echo $i | sed -e "s,$inputdir,,g"`
     echo "$toolspec $operation --input=\"$homedir$i\" --output=\"$homedir$outputdir$o.$outputext\"" >> $controlfile
 done
