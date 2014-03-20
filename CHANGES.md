@@ -1,3 +1,8 @@
+## 1.4.2
+
+  * Command lines wrapping also possible for Windows, using "cmd.exe -c {command}"
+  * GenericOptionsParser added to main class
+
 ## 1.4.1
 
   * ToolProcessor can be configured with respect to the working directory to run the command line tool
