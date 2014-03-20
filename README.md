@@ -45,7 +45,7 @@ Simply `git clone` the repository and run `mvn install`. The Hadoop executable j
 
 ### Prerequisites
 
-* A running Hadoop installation (either standalone, pseudo-distributed or cluster)
+* A running Hadoop 1.0.x installation (either standalone, pseudo-distributed or cluster).
 * SCAPE Toolspecs on HDFS and tools installed on each node
 * The control file (see below for details)
 
