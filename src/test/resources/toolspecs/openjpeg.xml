@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<tool xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://scape-project.eu/tool tool-1.0_draft.xsd" xmlns="http://scape-project.eu/tool" xmlns:xlink="http://www.w3.org/1999/xlink" schemaVersion="1.0">
+  <operations>
+    <operation name="image-to-j2k">
+      <description>Migrates an image to jpeg2000</description>
+      <command>/opt/openjpeg-1.5.0-Linux-i386/bin/image_to_j2k -i ${input} -o ${output} -I -p RPCL -n 7 -c [256,256],[256,256],[128,128],[128,128],[128,128],[128,128],[128,128] -b 64,64 -r 320.000,160.000,80.000,40.000,20.000,11.250,7.000,4.600,3.400,2.750,2.400,1.000</command>
+      <inputs>
+        <input name="input" required="true">
+          <description>Reference to input file</description>
+        </input>
+      </inputs>
+      <outputs>
+        <output name="output" required="true">
+          <description>Reference to output file. Only *.j2k, *.j2c or *.jp2!</description>
+        </output>
+      </outputs>
+    </operation>
+  </operations>
+</tool>
