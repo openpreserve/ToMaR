@@ -9,6 +9,8 @@ import java.net.URI;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.BlockLocation;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
@@ -87,6 +89,18 @@ public class HDFSFiler extends Filer {
         new File(fileRef.getParent()).mkdirs();
         Path localfile = new Path( fileRef.toString() );
         if(hdfs.exists(file)) {
+            if( LOG.isDebugEnabled() ) {
+                FileStatus fs = hdfs.getFileStatus(file);
+                BlockLocation[] locations = hdfs.getFileBlockLocations(fs, (long)0, fs.getLen());
+                for( BlockLocation location : locations ) {
+                    LOG.debug("location hosts: ");
+                    String[] hosts = location.getHosts();
+                    LOG.debug("  one blockLocation on: ");
+                    for( String host : hosts ) {
+                        LOG.debug("    host = " + host);
+                    }
+                }
+            }
             hdfs.copyToLocalFile(file, localfile);
         }
     }
