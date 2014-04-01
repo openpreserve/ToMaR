@@ -173,8 +173,8 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
                 LOG.debug("writing all lines to newControlFile");
                 for (String line : lines) {
                     LOG.debug("line = " + line);
-                    fsout.write(line.getBytes()); // FIXME : add a line break?
-                    byteCounter += line.length();
+                    fsout.write((line+"\n").getBytes()); // FIXME : add a line break?
+                    byteCounter += line.length()+1;
                 }
                 splits.add(new FileSplit(newControlFile, start,
                         byteCounter-start, new String[] { host }));
@@ -189,8 +189,8 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
                     LOG.debug("i = " + i + ", j = " + j );
                     LOG.debug("writing line to newControlFile");
                     LOG.debug("line = " + line);
-                    fsout.write(line.getBytes());
-                    byteCounter += line.length();
+                    fsout.write((line+"\n").getBytes());
+                    byteCounter += line.length()+1;
                     if (i < numLinesPerSplit + (j/numSplits)) {
                         i++;
                     } else {
@@ -221,6 +221,7 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
         LineReader lr = new LineReader(in, conf);
         Text controlLine = new Text();
         Map<String, ArrayList<String>> locationMap = new HashMap<String, ArrayList<String>>();
+        ArrayList<String> allHosts = new ArrayList<String>();
         int l = 0;
         while ((lr.readLine(controlLine)) > 0) {
             l += 1;
@@ -229,7 +230,31 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
             Path[] inFiles = getInputFiles(fs, parser, repo, controlLine.toString());
 
             // count for each host how many blocks it holds of the current control line's input files
-            String[] hosts = getSortedHosts(fs, inFiles);
+            String[] hostsOfFile = getSortedHosts(fs, inFiles);
+
+            String outputHosts = "";
+            for ( String host : hostsOfFile ) {
+                if( !allHosts.contains(host)) allHosts.add(host);
+            }
+            ArrayList<String> theseHosts = (ArrayList<String>)allHosts.clone();
+            for ( String host : hostsOfFile ) {
+                theseHosts.remove(host);
+            }
+
+            String[] hosts = new String[theseHosts.size() + hostsOfFile.length];
+            int h = 0;
+            for ( String host : hostsOfFile ) {
+                hosts[h] = hostsOfFile[h];
+                h++;
+                outputHosts += host + " ";
+            }
+            for( String host : theseHosts ) {
+                hosts[h] = theseHosts.get(h-hostsOfFile.length);
+                h++;
+                outputHosts += host + " ";
+            }
+            
+            LOG.debug("sorted hosts: " + outputHosts);
 
             addToLocationMap(locationMap, hosts, controlLine.toString(), l);
         }

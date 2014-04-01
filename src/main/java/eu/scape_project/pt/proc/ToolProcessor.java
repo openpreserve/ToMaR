@@ -273,7 +273,7 @@ public class ToolProcessor extends Processor {
     public void setWorkingDir(String workingDir) throws IOException {
         File dir = new File(workingDir);
         if( !dir.exists() ) dir.mkdirs();
-        else if( dir.isDirectory() ) throw new IOException("Working directory " + dir + " is not a directory");
+        else if( !dir.isDirectory() ) throw new IOException("Working directory " + dir + " is not a directory");
         this.workingDir = dir;
     }
 }

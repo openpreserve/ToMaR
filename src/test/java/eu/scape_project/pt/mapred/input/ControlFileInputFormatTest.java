@@ -158,39 +158,39 @@ public class ControlFileInputFormatTest {
         fs.addFile("newControlFile", true, null);
         Map<String, ArrayList<String>> locationMap = new HashMap<String, ArrayList<String>>(){{
             put("host1", new ArrayList<String>(){{
-                add("line1-1\n");
-                add("line1-2\n");
-                add("line1-3\n");
+                add("line1-1");
+                add("line1-2");
+                add("line1-3");
             }});
             put("host2", new ArrayList<String>(){{
-                add("line2-1\n");
-                add("line2-2\n");
-                add("line2-3\n");
-                add("line2-4\n");
-                add("line2-5\n");
-                add("line2-6\n");
+                add("line2-1");
+                add("line2-2");
+                add("line2-3");
+                add("line2-4");
+                add("line2-5");
+                add("line2-6");
             }});
             put("host3", new ArrayList<String>(){{
-                add("line3-1\n");
-                add("line3-2\n");
-                add("line3-3\n");
-                add("line3-4\n");
-                add("line3-5\n");
-                add("line3-6\n");
-                add("line3-7\n");
-                add("line3-8\n");
+                add("line3-1");
+                add("line3-2");
+                add("line3-3");
+                add("line3-4");
+                add("line3-5");
+                add("line3-6");
+                add("line3-7");
+                add("line3-8");
             }});
             put("host4", new ArrayList<String>(){{
-                add("line4-1\n");
-                add("line4-2\n");
-                add("line4-3\n");
-                add("line4-4\n");
-                add("line4-5\n");
-                add("line4-6\n");
-                add("line4-7\n");
-                add("line4-8\n");
-                add("line4-9\n");
-                add("line4-10\n");
+                add("line4-1");
+                add("line4-2");
+                add("line4-3");
+                add("line4-4");
+                add("line4-5");
+                add("line4-6");
+                add("line4-7");
+                add("line4-8");
+                add("line4-9");
+                add("line4-10");
             }});
         }};
         List<FileSplit> splits = ControlFileInputFormat.writeNewControlFileAndCreateSplits(
@@ -207,14 +207,14 @@ public class ControlFileInputFormatTest {
             if( cont.startsWith("line1-1") ) {
                 String expected = "";
                 for( String line : locationMap.get("host1") ) {
-                    expected += line;
+                    expected += line + "\n";
                 }
                 assertEquals(expected, cont);
             } else if( cont.startsWith("line2-1") ) {
                 String expected = "";
                 int j = 0;
                 for( String line : locationMap.get("host2") ) {
-                    expected += line;
+                    expected += line + "\n";
                     if( ++j == 3 ) break;
                 }
                 assertEquals(expected, cont);
@@ -223,14 +223,14 @@ public class ControlFileInputFormatTest {
                 int j = 0;
                 for( String line : locationMap.get("host2") ) {
                     if( ++j <= 3 ) continue;
-                    expected += line;
+                    expected += line + "\n";
                 }
                 assertEquals(expected, cont);
             } else if( cont.startsWith("line3-1") ) {
                 String expected = "";
                 int j = 0;
                 for( String line : locationMap.get("host3") ) {
-                    expected += line;
+                    expected += line + "\n";
                     if( ++j == 4 ) break;
                 }
                 assertEquals(expected, cont);
@@ -239,14 +239,14 @@ public class ControlFileInputFormatTest {
                 int j = 0;
                 for( String line : locationMap.get("host3") ) {
                     if( ++j <= 4 ) continue;
-                    expected += line;
+                    expected += line + "\n";
                 }
                 assertEquals(expected, cont);
             } else if( cont.startsWith("line4-1") ) {
                 String expected = "";
                 int j = 0;
                 for( String line : locationMap.get("host4") ) {
-                    expected += line;
+                    expected += line + "\n";
                     if( ++j == 3 ) break;
                 }
                 assertEquals(expected, cont);
@@ -255,7 +255,7 @@ public class ControlFileInputFormatTest {
                 int j = 0;
                 for( String line : locationMap.get("host4") ) {
                     if( ++j <= 3 ) continue;
-                    expected += line;
+                    expected += line + "\n";
                     if( ++j > 7  ) break;
                 }
                 assertEquals(expected, cont);
@@ -264,7 +264,7 @@ public class ControlFileInputFormatTest {
                 int j = 0;
                 for( String line : locationMap.get("host4") ) {
                     if( ++j <= 6 ) continue;
-                    expected += line;
+                    expected += line + "\n";
                 }
                 assertEquals(expected, cont);
             } else {
