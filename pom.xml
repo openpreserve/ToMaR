@@ -11,6 +11,10 @@
 	<artifactId>tomar</artifactId>
 	<name>SCAPE Tool-to-MapReduce Wrapper</name>
 	<description>Invokes SCAPE preservation tools on Hadoop MapReduce environments</description>
+	<properties>
+		<pig.version>0.12.0</pig.version>
+	</properties>
+	
 	<version>1.4.2-SNAPSHOT</version>
     
 	<build>
@@ -72,6 +76,12 @@
 			<version>4.8.2</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.pig</groupId>
+			<artifactId>pig</artifactId>
+			<version>${pig.version}</version>
+		</dependency>
+		
 	</dependencies>
     
 	<!-- for snapshot builds when building with travis -->
