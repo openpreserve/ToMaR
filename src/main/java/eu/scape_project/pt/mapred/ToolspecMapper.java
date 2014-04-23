@@ -1,5 +1,6 @@
 package eu.scape_project.pt.mapred;
 
+import eu.scape_project.pt.ToolWrapper;
 import eu.scape_project.pt.proc.Processor;
 import eu.scape_project.pt.proc.StreamProcessor;
 import eu.scape_project.pt.proc.ToolProcessor;

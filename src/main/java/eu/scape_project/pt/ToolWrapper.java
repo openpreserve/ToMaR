@@ -1,8 +1,39 @@
 package eu.scape_project.pt;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
-public static class ToolWrapper {
-    public static void wrap(String controlline) throws Exception {
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.pig.builtin.LOG;
+
+import eu.scape_project.pt.proc.Processor;
+import eu.scape_project.pt.proc.StreamProcessor;
+import eu.scape_project.pt.proc.ToolProcessor;
+import eu.scape_project.pt.repo.Repository;
+import eu.scape_project.pt.tool.Operation;
+import eu.scape_project.pt.tool.Tool;
+import eu.scape_project.pt.util.CmdLineParser;
+import eu.scape_project.pt.util.Command;
+import eu.scape_project.pt.util.fs.Filer;
+
+
+public class ToolWrapper {
+	private static final String SEP = " ";
+
+    private static CmdLineParser parser;
+    private static Repository repo;
+    private static Tool tool;
+    private static Operation operation;
+    
+    private static final Log LOG = LogFactory.getLog(ToolWrapper.class);
+
+    public static String wrap(String controlline) throws Exception {
         // parse input line for stdin/out file refs and tool/action commands
         parser.parse(controlline);
 
@@ -18,16 +49,16 @@ public static class ToolWrapper {
         for(int c = 0; c < commands.length; c++ ) {
             Command command = commands[c];
 
-            this.tool = repo.getTool(command.getTool());
+            tool = repo.getTool(command.getTool());
 
-            lastProcessor = new ToolProcessor(this.tool);
+            lastProcessor = new ToolProcessor(tool);
 
-            this.operation = lastProcessor.findOperation(command.getAction());
-            if( this.operation == null )
+            operation = lastProcessor.findOperation(command.getAction());
+            if( operation == null )
                 throw new IOException(
                         "operation " + command.getAction() + " not found");
 
-            lastProcessor.setOperation(this.operation);
+            lastProcessor.setOperation(operation);
 
             lastProcessor.initialize();
 
