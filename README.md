@@ -126,7 +126,7 @@ Contents of job input file (_control line_s):
 
 After running the job, contents of `part-r-00000` in output directory is:
 
-    1407062753      PostScript document text conforming DSC level 3.0, Level 2
+    0      PostScript document text conforming DSC level 3.0, Level 2
 
 #### Streamed file identification   
 
@@ -136,7 +136,7 @@ Contents of job input file (_control line_s):
 
 After running the job, contents of `part-r-00000` in output directory is:
 
-    -238455161      PostScript document text conforming DSC level 3.0, Level 2
+    0      PostScript document text conforming DSC level 3.0, Level 2
 
 #### Postscript to PDF migration
 
@@ -172,5 +172,5 @@ Contents of job input file (_control line_s):
 
 After running the job, contents of `part-r-00000` in output directory is:
 
-    -1771972640     ASCII text
+    0     ASCII text
 
