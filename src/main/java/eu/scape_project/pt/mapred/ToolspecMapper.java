@@ -44,17 +44,13 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
     private final Log LOG = LogFactory.getLog(getClass());
     private static final String SEP = " ";
 
-    private CmdLineParser parser;
-    private Repository repo;
-    private Tool tool;
-    private Operation operation;
-
     /**
      * Sets up toolspec repository and parser.
      */
     @Override
     public void setup(Context context) throws IOException {
         Configuration conf = context.getConfiguration();
+        /* Moved to ToolWrapper
         String strRepo = conf.get(PropertyNames.REPO_LOCATION);
         Path fRepo = new Path(strRepo);
         FileSystem fs = FileSystem.get(conf);
@@ -62,6 +58,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
 
         // create parser of command line input arguments
         parser = new PipedArgsParser();
+        */
     }
 
     /**
@@ -84,7 +81,8 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
 
         Text text = null;
         try {
-            String result = ToolWrapper.wrap(value.toString());
+            Configuration conf = context.getConfiguration();
+            text = new Text(new ToolWrapper().wrap(conf, value.toString()));
         } catch (Exception ex) {
             LOG.error("error during wrapping", ex);
             text = convertToResult(ex);

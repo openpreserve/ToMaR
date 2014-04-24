@@ -10,16 +10,23 @@ import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.pig.builtin.LOG;
 
 import eu.scape_project.pt.proc.Processor;
 import eu.scape_project.pt.proc.StreamProcessor;
 import eu.scape_project.pt.proc.ToolProcessor;
 import eu.scape_project.pt.repo.Repository;
+import eu.scape_project.pt.repo.ToolRepository;
 import eu.scape_project.pt.tool.Operation;
 import eu.scape_project.pt.tool.Tool;
 import eu.scape_project.pt.util.CmdLineParser;
 import eu.scape_project.pt.util.Command;
+import eu.scape_project.pt.util.PipedArgsParser;
+import eu.scape_project.pt.util.PropertyNames;
 import eu.scape_project.pt.util.fs.Filer;
 
 
@@ -32,10 +39,25 @@ public class ToolWrapper {
     private static Operation operation;
     
     private static final Log LOG = LogFactory.getLog(ToolWrapper.class);
+    
+    /**
+     * Sets up toolspec repository and parser.
+     */
+    //public void setup(Context context) throws IOException {
+    public void setup(Configuration conf) throws IOException {
+        String strRepo = conf.get(PropertyNames.REPO_LOCATION);
+        Path fRepo = new Path(strRepo);
+        FileSystem fs = FileSystem.get(conf);
+        this.repo = new ToolRepository(fs, fRepo);
 
-    public static String wrap(String controlline) throws Exception {
+        // create parser of command line input arguments
+        parser = new PipedArgsParser();
+    }
+
+    public String wrap(Configuration conf, String controlline) throws Exception {
         // parse input line for stdin/out file refs and tool/action commands
-        parser.parse(controlline);
+        this.setup(conf);
+    	parser.parse(controlline);
 
         final Command[] commands = parser.getCommands();
         final String strStdinFile = parser.getStdinFile();

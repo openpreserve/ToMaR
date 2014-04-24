@@ -44,6 +44,8 @@ public class ToolRepository implements Repository {
      * Constructs the repository from a given HDFSystem and a directory path.
      */
     public ToolRepository( FileSystem fs, Path directory ) throws IOException {
+    	System.out.println("fs.workingdir: "+fs.getWorkingDirectory());
+    	System.out.println("fs.directory: " + directory);
         if( !fs.exists(directory) )
             throw new FileNotFoundException(directory.toString());
 
