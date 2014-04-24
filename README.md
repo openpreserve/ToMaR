@@ -120,7 +120,7 @@ is described and demonstrated in this section. The input _control file_ used in 
 
 #### File identification 
 
-Contents of job input file (_control line_s):
+Contents of the control file:
 
     file identify --input="hdfs:///user/you/input/ps2pdf-input.ps"
 
@@ -130,7 +130,7 @@ After running the job, contents of `part-r-00000` in output directory is:
 
 #### Streamed file identification   
 
-Contents of job input file (_control line_s):
+Contents of the control file:
 
     "hdfs:///user/you/input/ps2pdf-input.ps" > file identify-stdin 
 
@@ -140,7 +140,7 @@ After running the job, contents of `part-r-00000` in output directory is:
 
 #### Postscript to PDF migration
 
-Contents of job input file (_control line_s):
+Contents of the control file:
 
     ps2pdf convert --input="hdfs:///user/you/input/ps2pdf-input.ps" --output="hdfs:///user/you/output/ps2pdf-output.pdf"
 
@@ -148,7 +148,7 @@ After running the job, specified output file location references the migrated PD
 
 #### Streamed postscript to PDF migration
 
-Contents of job input file (_control line_s):
+Contents of the control file:
 
     "hdfs:///user/you/input/ps2pdf-input.ps" > ps2pdf convert-streamed > "hdfs:///user/you/output/ps2pdf-output.pdf"
 
@@ -156,7 +156,7 @@ After running the job, specified output file location references the migrated PD
 
 #### Streamed postscript to PDF migration with consecutive piped file identification
 
-Contents of job input file (_control line_s):
+Contents of the control file:
 
     "hdfs:///user/you/input/ps2pdf-input.ps" > ps2pdf convert-streamed | file identify-stdin > "hdfs:///user/you/output/file-identified.txt" 
 
@@ -166,7 +166,7 @@ After running the job, contents of `file-identified.txt` in output directory is:
 
 #### Streamed postscript to PDF migration with two consecutive piped file identifications
 
-Contents of job input file (_control line_s):
+Contents of the control file:
 
     "hdfs:///user/you/input/ps2pdf-input.ps" > ps2pdf convert-streamed | file identify-stdin | file identify-stdin
 
