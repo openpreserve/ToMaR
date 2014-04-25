@@ -7,16 +7,16 @@ package eu.scape_project.pt.util;
  */
 public class PropertyNames {
 
-    public static final String INFILE = "INFILE";
-    public static final String OUTDIR = "OUTDIR";
-    public static final String ACTIONSTRING = "ACTIONSTRING";
+    public static final String REDUCE_CLASS = "mapreduce.reduce.class";
+    public static final String MAP_CLASS = "mapreduce.map.class";
+    public static final String OUTPUT_KEY_CLASS = "mapreduce.output.key.class";
+    public static final String OUTPUT_VALUE_CLASS = "mapreduce.output.value.class";
+    public static final String INPUTFORMAT_CLASS = "mapreduce.inputformat.class";
+    public static final String INFILE = "mapred.input.dir";
+    public static final String OUTDIR = "mapred.output.dir";
     public static final String REPO_LOCATION = "REPO_LOCATION";
 
     // nInputFormat
-    public static final String NUM_LINES_PER_SPLIT = "NUM_LINES_PER_SPLIT";
-
-    // Taverna specific settigns
-    public static final String TAVERNA_HOME = "TAVERNA_HOME";
-    public static final String TAVERNA_WORKFLOW = "WORKFLOW_LOCATION";
+    public static final String LINES_PER_MAP = "mapreduce.input.lineinputformat.linespermap";
 
 }
