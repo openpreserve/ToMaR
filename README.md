@@ -85,27 +85,27 @@ is described and demonstrated in this section. The input _control file_ used in 
 
 #### File identification 
 
-Contents of job input file (_control line_s):
+Contents of the control file:
 
     file identify --input="hdfs:///user/you/input/ps2pdf-input.ps"
 
 After running the job, contents of `part-r-00000` in output directory is:
 
-    1407062753      PostScript document text conforming DSC level 3.0, Level 2
+    0      PostScript document text conforming DSC level 3.0, Level 2
 
 #### Streamed file identification   
 
-Contents of job input file (_control line_s):
+Contents of the control file:
 
     "hdfs:///user/you/input/ps2pdf-input.ps" > file identify-stdin 
 
 After running the job, contents of `part-r-00000` in output directory is:
 
-    -238455161      PostScript document text conforming DSC level 3.0, Level 2
+    0      PostScript document text conforming DSC level 3.0, Level 2
 
 #### Postscript to PDF migration
 
-Contents of job input file (_control line_s):
+Contents of the control file:
 
     ps2pdf convert --input="hdfs:///user/you/input/ps2pdf-input.ps" --output="hdfs:///user/you/output/ps2pdf-output.pdf"
 
@@ -113,7 +113,7 @@ After running the job, specified output file location references the migrated PD
 
 #### Streamed postscript to PDF migration
 
-Contents of job input file (_control line_s):
+Contents of the control file:
 
     "hdfs:///user/you/input/ps2pdf-input.ps" > ps2pdf convert-streamed > "hdfs:///user/you/output/ps2pdf-output.pdf"
 
@@ -121,7 +121,7 @@ After running the job, specified output file location references the migrated PD
 
 #### Streamed postscript to PDF migration with consecutive piped file identification
 
-Contents of job input file (_control line_s):
+Contents of the control file:
 
     "hdfs:///user/you/input/ps2pdf-input.ps" > ps2pdf convert-streamed | file identify-stdin > "hdfs:///user/you/output/file-identified.txt" 
 
@@ -131,40 +131,11 @@ After running the job, contents of `file-identified.txt` in output directory is:
 
 #### Streamed postscript to PDF migration with two consecutive piped file identifications
 
-Contents of job input file (_control line_s):
+Contents of the control file:
 
     "hdfs:///user/you/input/ps2pdf-input.ps" > ps2pdf convert-streamed | file identify-stdin | file identify-stdin
 
 After running the job, contents of `part-r-00000` in output directory is:
 
-    -1771972640     ASCII text
+    0     ASCII text
 
-Executing a Taverna Workflow
-----------------------------
-
-*NOT TESTED. Maybe deprecated.*
-
-To execute a Taverna workflow, Taverna must be installed on the cluster. The wrapper can then be used to execute a Taverna workflow in parallel. 
-
-### Prerequisites
-
-Taverna must be installed on the cluster. On every machine, Taverna must be in the same path. If you want to execute the example workflow, convert (ImageMagic) and FITS must be installed. Convert should be in your path if you installed ImageMagic using a package manager. fits.sh must be added to the path in order for Taverna to find/execute it.
-
-### Execution
-
-You execute the wrapper like any other hadoop jar. The needed arguments are as follows:
-
-    hadoop jar {path-to-jar} -i {input-file-with-workflow-inputs} -o {where-to-save-results} -v {taverna-home} -w {workflow-location}
-
-Example:
-    
-    bin/hadoop jar /home/schenck/Workspaces/scape/scape/pt-mapred/target/pt-mapred-0.0.1-SNAPSHOT-jar-with-dependencies.jar -i hdfs:///user/schenck/inFile -o hdfs:///user/schenck/results/ -v /home/schenck/Programs/taverna-workbench-2.3.0/ -w hdfs:///user/schenck/tifWorkflow.tf2flow
-
-Example input for example workflow TiffWorkflow_*.t2flow thatneeds to be specified in {input-file-with-workflow-inputs}, one per line
-    
-    -inputvalue image_location {image-location}
-
-### URLs
-
-Taverna: http://www.taverna.org.uk/download/workbench/
-Fits: http://code.google.com/p/fits/
