@@ -16,6 +16,13 @@ public abstract class Processor implements Runnable {
      * Inputstream to read from. 
      */
     protected InputStream iStdOut;
+    
+    /**
+     * Inputstream to read from. 
+     */
+    protected InputStream iStdErr;
+    
+    
 
     /**
      * Outputstream to write to. 
@@ -47,6 +54,10 @@ public abstract class Processor implements Runnable {
     public InputStream getStdOut( ) {
         return this.iStdOut;
     }
+    
+    public InputStream getStdErr( ) {
+        return this.iStdErr;
+    }
 
     /**
      * Gets standard input stream of processor
@@ -61,6 +72,10 @@ public abstract class Processor implements Runnable {
      */
     public void setStdOut(InputStream out) {
         this.iStdOut = out;
+    }
+    
+    public void setStdErr(InputStream err) {
+        this.iStdErr = err;
     }
 
     /**
@@ -105,7 +120,15 @@ public abstract class Processor implements Runnable {
             LOG.debug(debugToken + " copy prev.stdout to stdin");
             LOG.debug("instance of stdout: " + this.prev.getStdOut().getClass().getName() );
             LOG.debug("instance of stdin: " + oStdIn.getClass().getName() );
+            System.out.println(debugToken + " copy prev.stdout to stdin");
+            System.out.println("instance of stdout: " + this.prev.getStdOut().getClass().getName());
+            System.out.println("instance of stdout: " + this.prev.getStdOut().getClass().getName());
             copyLarge(this.prev.getStdOut(), oStdIn);
+            if(prev.getStdErr() != null){
+            	copyLarge(this.prev.getStdErr(), oStdIn);
+            	this.prev.getStdErr().close();
+            }
+            
             this.prev.getStdOut().close();
             oStdIn.close();
         } catch (IOException ex) {

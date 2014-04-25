@@ -17,7 +17,10 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+
+import eu.scape_project.pt.util.PropertyNames;
 
 /**
  * Manages toolspecs for a given HDFS directory.
@@ -44,15 +47,33 @@ public class ToolRepository implements Repository {
      * Constructs the repository from a given HDFSystem and a directory path.
      */
     public ToolRepository( FileSystem fs, Path directory ) throws IOException {
-        if( !fs.exists(directory) )
-            throw new FileNotFoundException(directory.toString());
+       /* if( !fs.exists(directory) )
+            throw new FileNotFoundException(directory.toString());*/
 
-        if( !fs.getFileStatus(directory).isDir() )
-            throw new IOException( directory.toString() + "is not a directory");
+        /*if( !fs.getFileStatus(directory).isDir() )
+            throw new IOException( directory.toString() + "is not a directory");*/
 
         this.fs = fs;
         this.repo_dir = directory;
     }
+    
+    public ToolRepository( Configuration conf, Path directory ) throws IOException {
+        /* if( !fs.exists(directory) )
+             throw new FileNotFoundException(directory.toString());*/
+
+         /*if( !fs.getFileStatus(directory).isDir() )
+             throw new IOException( directory.toString() + "is not a directory");*/
+
+    	
+        String strRepo = conf.get(PropertyNames.REPO_LOCATION).trim();
+        
+        Path fRepo = new Path(strRepo);
+        
+        fs = fRepo.getFileSystem(conf);    	
+    	
+         //this.fs = fs;
+         this.repo_dir = directory;
+     }
 
     /**
      * Gets a certain Tool from the repository.
@@ -65,6 +86,7 @@ public class ToolRepository implements Repository {
                 repo_dir.toString() + System.getProperty("file.separator") 
                 + getToolName( strTool ) );
 
+        
         FSDataInputStream fis = fs.open( file );
         try {
             return fromInputStream( fis );

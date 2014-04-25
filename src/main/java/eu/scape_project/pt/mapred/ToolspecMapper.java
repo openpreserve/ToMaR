@@ -47,17 +47,22 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
     private Repository repo;
     private Tool tool;
     private Operation operation;
+    private Configuration conf;
 
     /**
      * Sets up toolspec repository and parser.
      */
     @Override
     public void setup(Context context) throws IOException {
-        Configuration conf = context.getConfiguration();
-        String strRepo = conf.get(PropertyNames.REPO_LOCATION);
+        conf = context.getConfiguration();
+        String strRepo = conf.get(PropertyNames.REPO_LOCATION).trim();
+        
         Path fRepo = new Path(strRepo);
+        
         FileSystem fs = FileSystem.get(conf);
-        this.repo = new ToolRepository(fs, fRepo);
+        
+        //this.repo = new ToolRepository(fs, fRepo);
+        this.repo = new ToolRepository(conf, fRepo);
 
         // create parser of command line input arguments
         parser = new PipedArgsParser();
@@ -125,7 +130,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
                 // localize parameters
                 for( Entry<String, String> entry : mapInputFileParameters.entrySet()) {
                     LOG.debug("input = " + entry.getValue());
-                    String localFileRefs = localiseFileRefs(entry.getValue());
+                    String localFileRefs = localiseFileRefs(entry.getValue().trim());
                     mapTempInputFileParameters.put( entry.getKey(), localFileRefs.substring(1));
                 }
 
@@ -133,7 +138,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
                         new HashMap<String, String>(mapOutputFileParameters[c]);
                 for( Entry<String, String> entry : mapOutputFileParameters[c].entrySet()) {
                     LOG.debug("output = " + entry.getValue());
-                    String localFileRefs = localiseFileRefs(entry.getValue());
+                    String localFileRefs = localiseFileRefs(entry.getValue().trim());
                     mapTempOutputFileParameters.put( entry.getKey(), localFileRefs.substring(1));
                 }
 
@@ -190,14 +195,17 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
     }
 
     private Text convertToResult(OutputStream oStdout, final String strStdoutFile) {
+    	System.out.println("convertToResult(OutputStream oStdout");
         if( oStdout instanceof ByteArrayOutputStream )
             return  new Text( ((ByteArrayOutputStream)oStdout).toByteArray() );
         return new Text( strStdoutFile );
     }
 
     private Text convertToResult(Exception ex) {
+    	
         StringWriter writer = new StringWriter();
         ex.printStackTrace(new PrintWriter(writer));
+        System.out.println("convertToResult(Exception ex): " +  writer.toString());
         return new Text( "ERROR: " + writer.toString() );
     }
 
@@ -237,6 +245,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
     }
 
     private String workingDir() {
+    	System.out.println("workingDir: " + System.getProperty("user.dir"));
         return System.getProperty("user.dir");
     }
 
