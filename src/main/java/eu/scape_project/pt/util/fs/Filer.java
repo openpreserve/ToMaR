@@ -31,6 +31,8 @@ public abstract class Filer {
         String scheme = uri.getScheme();
         if( scheme.equals("hdfs")) {
             return new HDFSFiler(uri);
+        }else if(scheme.equals("wasb")){
+        	return new WASBFiler(uri);
         }
         throw new IOException("no appropriate filer for URI " + strUri + " found");
     }
