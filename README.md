@@ -1,42 +1,7 @@
 SCAPE Tool-to-MapReduce Wrapper (ToMaR)
 ======================================
-
-Easily execute SCAPE Tools on Hadoop.
-
-### What does ToMaR do?
-
-ToMaR wraps _tools_ which are described by SCAPE Tool Specification Language (_toolspec_) for distributed execution in a MapReduce job. 
-
-See the [Toolspec XML Schema draft](https://github.com/openplanets/scape-toolspecs/blob/master/toolspec.xsd) and [example toolspecs](https://github.com/openplanets/scape-toolspecs) for deeper understanding of toolspecs.
-
-ToMaR consumes a plain text control file which describes one tool invocation line per line.
-A _control line_ consists of a pair of a _toolspec_ name and an _action_ of that toolspec. An _action_ is associated with a specific shell command pattern by the _toolspec_.
-
-Per map task one line from the control file is processed. The wrapper will
-
-* fetch the specified _toolspec_ from the _toolspec repository_
-* parse the _control line_ 
-* copy remote files specified by input parameters of the _control line_ to the local file system
-* execute the _action_'s command pattern in the local runtime environment of the cluster node
-* deposit resulting output files to the remote location specified by output parameters of the _control line_
-
-In order to avoid temporary files streaming of data from/to files and between executions is supported too.
-
-### What are the benefits for end user?
-
-ToMaR
-
-* easily takes up external tools with a clear mapping between the Hadoop system and the physical invocation of the tool.
-* uses the SCAPE Toolspec Schema and its advantage of associating simple keywords with complex command-line patterns
-* requires no programming skills as only the control file has to be created per job.
-
-### Who is the intended audience?
-
-ToMaR is for those
-
-* who need to make their tools fit for distributed execution
-* who need to integrate distributed tool execution into existing workflows
-* without any programming skills who need a convenient way to configure distributed tool execution 
+*Let your Preservation Tools Scale*
+## Installation and Use
 
 ### Installation
 
@@ -120,27 +85,27 @@ is described and demonstrated in this section. The input _control file_ used in 
 
 #### File identification 
 
-Contents of the control file:
+Contents of job input file (_control line_s):
 
     file identify --input="hdfs:///user/you/input/ps2pdf-input.ps"
 
 After running the job, contents of `part-r-00000` in output directory is:
 
-    0      PostScript document text conforming DSC level 3.0, Level 2
+    1407062753      PostScript document text conforming DSC level 3.0, Level 2
 
 #### Streamed file identification   
 
-Contents of the control file:
+Contents of job input file (_control line_s):
 
     "hdfs:///user/you/input/ps2pdf-input.ps" > file identify-stdin 
 
 After running the job, contents of `part-r-00000` in output directory is:
 
-    0      PostScript document text conforming DSC level 3.0, Level 2
+    -238455161      PostScript document text conforming DSC level 3.0, Level 2
 
 #### Postscript to PDF migration
 
-Contents of the control file:
+Contents of job input file (_control line_s):
 
     ps2pdf convert --input="hdfs:///user/you/input/ps2pdf-input.ps" --output="hdfs:///user/you/output/ps2pdf-output.pdf"
 
@@ -148,7 +113,7 @@ After running the job, specified output file location references the migrated PD
 
 #### Streamed postscript to PDF migration
 
-Contents of the control file:
+Contents of job input file (_control line_s):
 
     "hdfs:///user/you/input/ps2pdf-input.ps" > ps2pdf convert-streamed > "hdfs:///user/you/output/ps2pdf-output.pdf"
 
@@ -156,7 +121,7 @@ After running the job, specified output file location references the migrated PD
 
 #### Streamed postscript to PDF migration with consecutive piped file identification
 
-Contents of the control file:
+Contents of job input file (_control line_s):
 
     "hdfs:///user/you/input/ps2pdf-input.ps" > ps2pdf convert-streamed | file identify-stdin > "hdfs:///user/you/output/file-identified.txt" 
 
@@ -166,11 +131,40 @@ After running the job, contents of `file-identified.txt` in output directory is:
 
 #### Streamed postscript to PDF migration with two consecutive piped file identifications
 
-Contents of the control file:
+Contents of job input file (_control line_s):
 
     "hdfs:///user/you/input/ps2pdf-input.ps" > ps2pdf convert-streamed | file identify-stdin | file identify-stdin
 
 After running the job, contents of `part-r-00000` in output directory is:
 
-    0     ASCII text
+    -1771972640     ASCII text
 
+Executing a Taverna Workflow
+----------------------------
+
+*NOT TESTED. Maybe deprecated.*
+
+To execute a Taverna workflow, Taverna must be installed on the cluster. The wrapper can then be used to execute a Taverna workflow in parallel. 
+
+### Prerequisites
+
+Taverna must be installed on the cluster. On every machine, Taverna must be in the same path. If you want to execute the example workflow, convert (ImageMagic) and FITS must be installed. Convert should be in your path if you installed ImageMagic using a package manager. fits.sh must be added to the path in order for Taverna to find/execute it.
+
+### Execution
+
+You execute the wrapper like any other hadoop jar. The needed arguments are as follows:
+
+    hadoop jar {path-to-jar} -i {input-file-with-workflow-inputs} -o {where-to-save-results} -v {taverna-home} -w {workflow-location}
+
+Example:
+    
+    bin/hadoop jar /home/schenck/Workspaces/scape/scape/pt-mapred/target/pt-mapred-0.0.1-SNAPSHOT-jar-with-dependencies.jar -i hdfs:///user/schenck/inFile -o hdfs:///user/schenck/results/ -v /home/schenck/Programs/taverna-workbench-2.3.0/ -w hdfs:///user/schenck/tifWorkflow.tf2flow
+
+Example input for example workflow TiffWorkflow_*.t2flow thatneeds to be specified in {input-file-with-workflow-inputs}, one per line
+    
+    -inputvalue image_location {image-location}
+
+### URLs
+
+Taverna: http://www.taverna.org.uk/download/workbench/
+Fits: http://code.google.com/p/fits/
