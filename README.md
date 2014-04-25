@@ -23,10 +23,12 @@ Simply `git clone` the repository and run `mvn install`. The Hadoop executable j
         -n {lines-per-split}
 
 * *path-to-jar* leads to the jar file of the SCAPE ToMaR.
-* *control-file* 
-* *output-dir-for-job* is the directory on HDFS where output files will be written to. Default is `out`.
+* *control-file* located on HDFS
+* *output-dir-for-job* is the directory on HDFS where output files will be written to. Default is `out/{some random number}`.
 * *toolspec-repo-dir* is a directory on HDFS containing available toolspecs.
 * *lines-per-split* configures the number of lines each mapper (worker node) will receive for processing, default is 10.
+
+Additionally, you can specify generic options for the Hadoop job, eg. for a custom input format or a reducer class, described [here](http://hadoop.apache.org/docs/r1.2.1/commands_manual.html#Generic+Options).
 
 ### The Control File
 
