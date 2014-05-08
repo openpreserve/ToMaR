@@ -38,7 +38,9 @@ public class ControlLineUDF extends EvalFunc<Tuple> {
 			
 			System.out.println("CtrlLine: "+ctrlLine);
 			System.out.println("toolspecsPath: "+toolspecsPath);
-			String stdOut = new ToolWrapper().wrap(conf, ctrlLine);
+            ToolWrapper toolWrapper = new ToolWrapper();
+            toolWrapper.setup(conf);
+			String stdOut = toolWrapper.wrap(ctrlLine);
 			//System.out.println("ToolWrapper.wrap returns: "+stdOut);
 			Tuple tuple = tupleFactory.newTuple(stdOut);
 			return tuple;

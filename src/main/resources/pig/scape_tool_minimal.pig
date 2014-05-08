@@ -1,6 +1,6 @@
 REGISTER /home/rainer/data/projects/tomar_udf/tomar/target/tomar-1.4.2-SNAPSHOT-jar-with-dependencies.jar;
 
-DEFINE ToMarService eu.scape_project.pt.udf.CmdToolUDF();
+DEFINE ToMarService eu.scape_project.pt.udf.ControlLineUDF();
 DEFINE XPathService eu.scape_project.pt.udf.XPathFunction();
 
 %DECLARE toolspecs_path 'toolspecs'; 

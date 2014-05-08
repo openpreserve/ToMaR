@@ -13,8 +13,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.mapreduce.Mapper.Context;
-import org.apache.pig.builtin.LOG;
 
 import eu.scape_project.pt.proc.Processor;
 import eu.scape_project.pt.proc.StreamProcessor;
@@ -31,15 +29,15 @@ import eu.scape_project.pt.util.fs.Filer;
 
 
 public class ToolWrapper {
-	private static final String SEP = " ";
+    private static final String SEP = " ";
 
-    private static CmdLineParser parser;
-    private static Repository repo;
-    private static Tool tool;
-    private static Operation operation;
-    
-    private static final Log LOG = LogFactory.getLog(ToolWrapper.class);
-    
+    private CmdLineParser parser;
+    private Repository repo;
+    private Tool tool;
+    private Operation operation;
+
+    private final Log LOG = LogFactory.getLog(ToolWrapper.class);
+
     /**
      * Sets up toolspec repository and parser.
      */
@@ -54,10 +52,9 @@ public class ToolWrapper {
         parser = new PipedArgsParser();
     }
 
-    public String wrap(Configuration conf, String controlline) throws Exception {
+    public String wrap(String controlline) throws Exception {
         // parse input line for stdin/out file refs and tool/action commands
-        this.setup(conf);
-    	parser.parse(controlline);
+        parser.parse(controlline);
 
         final Command[] commands = parser.getCommands();
         final String strStdinFile = parser.getStdinFile();
@@ -103,7 +100,7 @@ public class ToolWrapper {
             }
 
             Map<String, String> mapTempOutputFileParameters = 
-                    new HashMap<String, String>(mapOutputFileParameters[c]);
+                new HashMap<String, String>(mapOutputFileParameters[c]);
             for( Entry<String, String> entry : mapOutputFileParameters[c].entrySet()) {
                 LOG.debug("output = " + entry.getValue());
                 String localFileRefs = localiseFileRefs(entry.getValue());
@@ -134,7 +131,7 @@ public class ToolWrapper {
         OutputStream oStdout = createStdOut(strStdoutFile);
         StreamProcessor streamProcessorOut = new StreamProcessor(oStdout);
         lastProcessor.next(streamProcessorOut);
-        
+
         firstProcessor.execute();
 
         delocalizeOutputParameters(mapOutputFileParameters);

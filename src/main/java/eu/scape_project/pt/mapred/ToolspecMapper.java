@@ -1,37 +1,17 @@
 package eu.scape_project.pt.mapred;
 
-import eu.scape_project.pt.ToolWrapper;
-import eu.scape_project.pt.proc.Processor;
-import eu.scape_project.pt.proc.StreamProcessor;
-import eu.scape_project.pt.proc.ToolProcessor;
-import eu.scape_project.pt.repo.Repository;
-import eu.scape_project.pt.repo.ToolRepository;
-import eu.scape_project.pt.tool.Operation;
-import eu.scape_project.pt.tool.Tool;
-import eu.scape_project.pt.util.CmdLineParser;
-import eu.scape_project.pt.util.Command;
-import eu.scape_project.pt.util.PipedArgsParser;
-import eu.scape_project.pt.util.PropertyNames;
-import eu.scape_project.pt.util.fs.Filer;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+
+import eu.scape_project.pt.ToolWrapper;
 
 /**
  * The Toolspec executor.
@@ -42,7 +22,8 @@ import org.apache.hadoop.mapreduce.Mapper;
 public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Text> {
 
     private final Log LOG = LogFactory.getLog(getClass());
-    private static final String SEP = " ";
+    private ToolWrapper toolWrapper;
+
 
     /**
      * Sets up toolspec repository and parser.
@@ -59,6 +40,8 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
         // create parser of command line input arguments
         parser = new PipedArgsParser();
         */
+        this.toolWrapper = new ToolWrapper();
+        this.toolWrapper.setup(conf);
     }
 
     /**
@@ -81,8 +64,7 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
 
         Text text = null;
         try {
-            Configuration conf = context.getConfiguration();
-            text = new Text(new ToolWrapper().wrap(conf, value.toString()));
+            text = new Text(this.toolWrapper.wrap(value.toString()));
         } catch (Exception ex) {
             LOG.error("error during wrapping", ex);
             text = convertToResult(ex);
