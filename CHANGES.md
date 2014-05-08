@@ -1,3 +1,7 @@
+## 1.5.0
+
+  * Change of the command line interface to resemble the Streaming API of Hadoop. 
+
 ## 1.4.2
 
   * Command lines wrapping also possible for Windows, using "cmd.exe -c {command}"
