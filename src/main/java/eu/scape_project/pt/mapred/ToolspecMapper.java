@@ -162,11 +162,14 @@ public class ToolspecMapper extends Mapper<LongWritable, Text, LongWritable, Tex
             StreamProcessor streamProcessorOut = new StreamProcessor(oStdout);
             lastProcessor.next(streamProcessorOut);
             
-            firstProcessor.execute();
-
-            delocalizeOutputParameters(mapOutputFileParameters);
+            int retVal = firstProcessor.execute();
 
             text = convertToResult(oStdout, strStdoutFile);
+
+            if (retVal != 0)
+                throw new RuntimeException(text.toString());
+
+            delocalizeOutputParameters(mapOutputFileParameters);
 
         } catch (Exception ex) {
             LOG.error("error during mapping", ex);

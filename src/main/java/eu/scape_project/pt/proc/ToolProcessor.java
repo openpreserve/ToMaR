@@ -110,7 +110,7 @@ public class ToolProcessor extends Processor {
         }
 
         String strCmd = replaceAll(this.operation.getCommand(), allInputs);
-        LOG.debug("strCmd = " + strCmd );
+        LOG.info("executing " + strCmd );
 
         String[] cmd;
         if( System.getProperty("os.name").startsWith("Windows")){
@@ -118,7 +118,10 @@ public class ToolProcessor extends Processor {
         } else {
             cmd = new String[]{"sh", "-c", strCmd};
         }
-        proc = Runtime.getRuntime().exec(cmd, null, this.workingDir);
+        ProcessBuilder pb = new ProcessBuilder(cmd);
+        pb.redirectErrorStream(true);
+        pb.directory(this.workingDir);
+        proc = pb.start();//Runtime.getRuntime().exec(cmd, null, this.workingDir);
 
         this.setStdIn(proc.getOutputStream());
         this.setStdOut(proc.getInputStream());
