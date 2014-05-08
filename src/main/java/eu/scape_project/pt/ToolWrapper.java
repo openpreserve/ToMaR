@@ -132,11 +132,16 @@ public class ToolWrapper {
         StreamProcessor streamProcessorOut = new StreamProcessor(oStdout);
         lastProcessor.next(streamProcessorOut);
 
-        firstProcessor.execute();
+        int retVal = firstProcessor.execute();
+
+        String text = convertToResult(oStdout, strStdoutFile);
+
+        if (retVal != 0)
+            throw new RuntimeException(text.toString());
 
         delocalizeOutputParameters(mapOutputFileParameters);
 
-        return convertToResult(oStdout, strStdoutFile);
+        return text;
     }
 
     static private String localiseFileRefs(String localFile) throws IOException {
