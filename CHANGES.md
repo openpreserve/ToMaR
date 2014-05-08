@@ -1,3 +1,8 @@
+## 1.5.2
+  * Add UDF for Pig scripts.
+  * Decouple ToolWrapper from ToolspecMapper so that the core functionality for ToMaR can be called outside of the Mapper.
+  * Standard error stream of the local process is redirected to its standard output stream. In case of an non-zero exit status of the process the output of the process is thrown.
+  
 ## 1.5.0
 
   * Change of the command line interface to resemble the Streaming API of Hadoop. 
