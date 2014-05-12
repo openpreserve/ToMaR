@@ -12,7 +12,7 @@ In short, With ToMaR you can:
 * Run existing tools like FITS or Jpylyzer against large amounts of files
 * Execute tools in a scalable fashion on a MapReduce cluster
 * Enable scalable workflows which chain together a set of different tools like Fits, Apache Tika, Droid, Unix File
-* Process payloads that are simply too big to be computed on a single machine.
+* Process payloads that are simply too big to be computed on a single machine
 
 What Can ToMaR Do For Me?
 -------------------------
@@ -22,7 +22,7 @@ ToMaR offers the following benefits:
 * Easy take up of external tools with a clear mapping between the instructions and the physical invocation of the tool
 * Use the SCAPE Toolspec, as well as other existing Toolspecs
 * Associate simple keywords with complex command-line patterns
-* No programming skills are required as only a control file needs to be set up per job. 
+* No programming skills are required as only a control file needs to be set up per job 
 
 ToMaR Can Be Used By
 --------------------
