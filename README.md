@@ -1,7 +1,9 @@
 SCAPE Tool-to-MapReduce Wrapper (ToMaR)
 ======================================
 *Let your Preservation Tools Scale*
-## Installation and Use
+
+Installation and Use
+--------------------
 
 ### Installation
 
@@ -10,7 +12,7 @@ Simply `git clone` the repository and run `mvn install`. The Hadoop executable j
 
 ### Prerequisites
 
-* A running Hadoop 1.0.x installation (either standalone, pseudo-distributed or cluster).
+* A running Hadoop 1.0.x installation (either standalone, pseudo-distributed or cluster)
 * SCAPE Toolspecs on HDFS and tools installed on each node
 * The control file (see below for details)
 
@@ -22,11 +24,11 @@ Simply `git clone` the repository and run `mvn install`. The Hadoop executable j
         -r {toolspec-repo-dir}
         -n {lines-per-split}
 
-* *path-to-jar* leads to the jar file of the SCAPE ToMaR.
+* *path-to-jar* leads to the jar file of the SCAPE ToMaR
 * *control-file* located on HDFS
-* *output-dir-for-job* is the directory on HDFS where output files will be written to. Default is `out/{some random number}`.
-* *toolspec-repo-dir* is a directory on HDFS containing available toolspecs.
-* *lines-per-split* configures the number of lines each mapper (worker node) will receive for processing, default is 10.
+* *output-dir-for-job* is the directory on HDFS where output files will be written to. Default is `out/{some random number}`
+* *toolspec-repo-dir* is a directory on HDFS containing available toolspecs
+* *lines-per-split* configures the number of lines each mapper (worker node) will receive for processing, default is 10
 
 Additionally, you can specify generic options for the Hadoop job, eg. for a custom input format or a reducer class, described [here](http://hadoop.apache.org/docs/r1.2.1/commands_manual.html#Generic+Options).
 
@@ -77,7 +79,7 @@ As an example the execution of ToMaR on
 5. streamed in ps-to-pdf migration with consecutive piped file identification
 6. streamed in ps-to-pdf migration with two consecutive piped file identifications
 
-is described and demonstrated in this section. The input _control file_ used in this example only contains one control line each. Of course in a productive environment one would have thousands of such conrol lines.
+is described and demonstrated in this section. The input _control file_ used in this example only contains one control line each. Of course in a productive environment one would have thousands of such control lines.
 
 #### Prerequisites
 
