@@ -4,13 +4,16 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
@@ -75,7 +78,7 @@ public class JavaToolProcessor extends ToolProcessor {
      */
     @Override
     public int execute() throws Exception {
-        LOG.debug("execute");
+        LOG.info("execute");
 
         Map<String, String> allInputs = new HashMap<String, String>();
         allInputs.putAll(getInputFileParameters());
@@ -83,13 +86,17 @@ public class JavaToolProcessor extends ToolProcessor {
         allInputs.putAll(getOtherParameters());
 
         for (String key : allInputs.keySet()) {
-            LOG.debug("Key: " + key + " = " + allInputs.get(key));
+            LOG.info("Key: " + key + " = " + allInputs.get(key));
         }
 
         String strCmd = replaceAll(this.operation.getCommand(), allInputs);
-        LOG.debug("strCmd = " + strCmd);
+        LOG.info("strCmd = " + strCmd);
 
         String[] args = parseCmdLineArgs(strCmd);
+
+        for ( String arg: args ) {
+            LOG.info("arg: " + arg);
+        }
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PrintStream localOut = new PrintStream(baos);
@@ -107,17 +114,21 @@ public class JavaToolProcessor extends ToolProcessor {
 
         try {
             this.theClass.getMethod("main", String[].class).invoke(null, (Object)args);
-        } catch (ExitException ee) {
-            LOG.debug("Application tried to exit VM", ee);
-        } catch (Exception e) {
-            LOG.error("error during class execution " + e);
-            throw e;
+        } catch (InvocationTargetException ie ) {
+            Throwable t = ie.getCause();
+            if( t != null && t instanceof ExitException ) {
+                LOG.debug("application tried to exit " + t);
+            } else {
+                LOG.error("error during class execution " + ie);
+                throw ie;
+            }
+        } finally {
+            securityManager(false);
+            System.setIn(stdin);
+            System.setOut(stdout);
+            this.setStdOut(new ByteArrayInputStream(baos.toByteArray()));
         }
-        securityManager(false);
 
-        this.setStdOut(new ByteArrayInputStream(baos.toByteArray()));
-        System.setIn(stdin);
-        System.setOut(stdout);
 
         int retval = 0;
         if( this.next != null )
@@ -144,7 +155,7 @@ public class JavaToolProcessor extends ToolProcessor {
         @SuppressWarnings("rawtypes")
         Class aClass = null;
         ClassNotFoundException ex = new ClassNotFoundException("Java Tool not in classpath");
-        Stack<String> sArgs = new Stack<String>();
+        LinkedList<String> sArgs = new LinkedList<String>();
         for (int i = args.length-1; i > 0; i--) {
             if (args[i].endsWith(".jar")) {
                 JarFile jar = new JarFile(args[i], false);
