@@ -3,11 +3,20 @@ package eu.scape_project.pt.mapred;
 import eu.scape_project.pt.repo.Repository;
 import eu.scape_project.pt.repo.ToolRepository;
 import eu.scape_project.pt.util.PropertyNames;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.GnuParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
@@ -19,8 +28,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.ToolRunner;
-
 import org.apache.hadoop.mapreduce.lib.input.NLineInputFormat;
 
 /**
@@ -29,146 +38,151 @@ import org.apache.hadoop.mapreduce.lib.input.NLineInputFormat;
  * 
  * @author Rainer Schmidt [rschmidt13]
  * @author Matthias Rella [myrho]
- * @author Martin Schenck [schenck]
  */ 
 public class CLIWrapper extends Configured implements org.apache.hadoop.util.Tool {
 
-	private static Log LOG = LogFactory.getLog(CLIWrapper.class);
-	
+    private static Log LOG = LogFactory.getLog(CLIWrapper.class);
+
+    private Options buildOptions() {
+        Options options = new Options();
+        Option oH = OptionBuilder
+            .withDescription("print help")
+            .create("help");
+        Option oI = OptionBuilder.withArgName("control file")
+            .hasArg()
+            .isRequired(true)
+            .withDescription("specify the control file containing the toolspec, operation and parameter specifications")
+            .create("i");
+        Option oO = OptionBuilder.withArgName("output directory")
+            .hasArg()
+            .isRequired(false)
+            .withDescription("specify the directory where results of the MapReduce job will be written to")
+            .create("o");
+        Option oN = OptionBuilder.withArgName("number of lines")
+            .hasArg()
+            .isRequired(false)
+            .withDescription("specify the number of lines one mapper should get")
+            .create("n");
+        Option oR = OptionBuilder.withArgName("toolspec repository")
+            .hasArg()
+            .isRequired(true)
+            .withDescription("specify the path to the toolspec repository")
+            .create("r");
+
+        options.addOption(oH);
+        options.addOption(oI);
+        options.addOption(oO);
+        options.addOption(oN);
+        options.addOption(oR);
+        return options;
+    }
+
+    private String[] parseOptions(Configuration conf, String[] args) {
+        CommandLineParser parser = new GnuParser();
+
+        Options opts = buildOptions();
+        try{
+            CommandLine commandLine = parser.parse(opts, args, true);
+            processOptions(conf, commandLine);
+            return commandLine.getArgs();
+        } catch(ParseException e){
+            LOG.warn("options parsing failed: "+e.getMessage());
+
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("options are: ", opts);
+        }
+        return args;
+    }
+
+    private void processOptions(Configuration conf, CommandLine line) {
+        if( line.hasOption("h")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("options are: ", buildOptions());
+            return;
+        }
+        if( line.hasOption("i")){
+            //FileInputFormat.setInputPaths(conf, new Path(line.getOptionValue("i")));
+            conf.set(PropertyNames.INFILE, line.getOptionValue("i"));
+        }
+        if( line.hasOption("o")){
+            //FileOutputFormat.setOutputPath(new Path(line.getOptionValue("o")));
+            conf.set(PropertyNames.OUTDIR, line.getOptionValue("o"));
+        }
+        if( line.hasOption("n")){
+            //NLineInputFormat.setNumLinesPerSplit(
+                //conf, 
+                //Integer.parseInt(line.getOptionValue("n")));
+            conf.set(PropertyNames.LINES_PER_MAP, line.getOptionValue("n"));
+        }
+        if( line.hasOption("r")){
+            conf.set(PropertyNames.REPO_LOCATION, line.getOptionValue("r"));
+        }
+
+    }
+
+    private void defaultOptions(Configuration conf) {
+        if( conf.get(PropertyNames.REDUCE_CLASS ) == null ) {
+            if( conf.get(PropertyNames.OUTPUT_KEY_CLASS) == null ) {
+                conf.set(PropertyNames.OUTPUT_KEY_CLASS, "org.apache.hadoop.io.LongWritable");
+            }
+            if( conf.get(PropertyNames.OUTPUT_VALUE_CLASS) == null ) {
+                conf.set(PropertyNames.OUTPUT_VALUE_CLASS, "org.apache.hadoop.io.Text");
+            }
+        }
+        if( conf.get(PropertyNames.OUTDIR ) == null ) {
+            conf.set(PropertyNames.OUTDIR, "out/"+System.nanoTime()%10000 );
+        }
+        if( conf.get(PropertyNames.INPUTFORMAT_CLASS ) == null ) {
+            conf.set(PropertyNames.INPUTFORMAT_CLASS, "org.apache.hadoop.mapreduce.lib.input.NLineInputFormat");
+        }
+
+    }
+    
     /**
      * Sets up, initializes and starts the Job.
      */
     @Override
     public int run(String[] args) throws Exception {
-
         Configuration conf = getConf();
+
+        parseOptions(conf, args);
+        defaultOptions(conf);
+
+        //hadoop's output 
+        LOG.info("Output: " + conf.get(PropertyNames.OUTDIR));
+        //toolspec directory
+        LOG.info("Toolspec Directory: " 
+                + conf.get(PropertyNames.REPO_LOCATION));
+        //NInputFormat
+        LOG.info("Number of Lines: " 
+                + conf.get(PropertyNames.LINES_PER_MAP));
+
         Job job = new Job(conf);
+        job.setJarByClass(getClass());
+        job.setMapperClass(ToolspecMapper.class);
 
-        job.setJarByClass(CLIWrapper.class);
+        job.setMapOutputKeyClass(LongWritable.class);
+        job.setMapOutputValueClass(Text.class);
 
-        job.setOutputKeyClass(LongWritable.class);
-        // TODO Output Value Class may depend on the tool invoked
-        job.setOutputValueClass(Text.class);
-
-        if(conf.get(PropertyNames.TAVERNA_WORKFLOW) != null 
-           && conf.get(PropertyNames.TAVERNA_WORKFLOW) != "") {
-            job.setMapperClass(TavernaMapper.class);
-        } else {
-            job.setMapperClass(ToolspecMapper.class);
-        }
-        
-        job.setInputFormatClass(NLineInputFormat.class);
-        NLineInputFormat.setNumLinesPerSplit(
-            job, 
-            Integer.parseInt(conf.get(PropertyNames.NUM_LINES_PER_SPLIT)));
-        
-        // copy input file to temporary directory
-        FileSystem fs = FileSystem.get(conf);
-        Path fSrc = new Path(conf.get(PropertyNames.INFILE));
-        Path fDst = new Path("/tmp/input-" + job.getJobName());
-        fs.copyFromLocalFile(false, true, fSrc, fDst);
-
-		FileInputFormat.addInputPath(job, fDst);
-		FileOutputFormat.setOutputPath(job, new Path(conf.get(PropertyNames.OUTDIR)) ); 
-				
-		job.waitForCompletion(true);
-		return job.isSuccessful() ? 0 : 1;
-	}
-	
+        job.waitForCompletion(true);
+        return job.isSuccessful() ? 0 : 1;
+    }
+    
     /**
      * CLIWrapper user interface. See printUsage for further information.
      */
-	public static void main(String[] args) {
-		
-		int res = 1;
-		CLIWrapper mr = new CLIWrapper();
-        Configuration conf = new Configuration();
-        Repository repo;
-
-        Map<String, String> parameters = new HashMap<String, String>() {{
-            put("i", PropertyNames.INFILE );
-            put("o", PropertyNames.OUTDIR );
-            put("t", "mapred.job.reuse.jvm.num.tasks" );
-            put("n", PropertyNames.NUM_LINES_PER_SPLIT );
-            put("r", PropertyNames.REPO_LOCATION);
-            put("v", PropertyNames.TAVERNA_HOME );
-            put("w", PropertyNames.TAVERNA_WORKFLOW );
-            put("j", "mapred.job.name" );
-        }};
-        		
-		try {
-            String pStrings = "";
-            for( String i : parameters.keySet() )
-                pStrings += i + ":";
-
-			OptionParser parser = new OptionParser(pStrings);
-            OptionSet options = parser.parse(args);
-
-            // default values:
-            conf.set(PropertyNames.NUM_LINES_PER_SPLIT, "1");
-            conf.set(PropertyNames.OUTDIR, "out/"+System.nanoTime()%10000 );
-
-            // store parameter values:
-            for( Entry<String, String> param : parameters.entrySet() )
-                if(options.hasArgument(param.getKey()))
-                    conf.set(param.getValue(), 
-                             options.valueOf(param.getKey()).toString());
-
-            LOG.info("Job name: " + conf.get("mapred.job.name"));
-			//hadoop's output 
-			LOG.info("Output: " + conf.get(PropertyNames.OUTDIR));
-            //action to select
-            LOG.info("Action: " + conf.get(PropertyNames.ACTIONSTRING));
-			//toolspec directory
-            LOG.info("Toolspec Directory: " 
-                    + conf.get(PropertyNames.REPO_LOCATION));
-            //jvm reuse
-            LOG.info("JVM reuse: " 
-                    + conf.get("mapred.job.reuse.jvm.num.tasks"));
-            //NInputFormat
-            LOG.info("Number of Lines: " 
-                    + conf.get(PropertyNames.NUM_LINES_PER_SPLIT));
-            // taverna workflow location
-			LOG.info("Taverna: " + conf.get(PropertyNames.TAVERNA_HOME));
-            // taverna home
-			LOG.info("Workflow: " + conf.get(PropertyNames.TAVERNA_WORKFLOW));
-
-            // check if enough parameters:
-
-		    if ( conf.get(PropertyNames.INFILE) == null )
-                throw new Exception("Input file needed");
-
-            Path fRepo = new Path( conf.get(PropertyNames.REPO_LOCATION) );
-            repo = new ToolRepository(FileSystem.get( conf ),fRepo );
-
-            String[] astrToolspecs = repo.getToolList();
-            LOG.info( "Available ToolSpecs: ");
-            for( String strToolspec: astrToolspecs ) 
-                LOG.info( strToolspec );
-
-		} catch (Exception e) {
-            printUsage();
-			LOG.error(e);
-			e.printStackTrace();
-			System.exit(-1);
-		}
-				
+    public static void main(String[] args) throws Exception {
+        
+        int res = 1;
+        CLIWrapper mr = new CLIWrapper();
+                
         try {
-			LOG.info("Running MapReduce ..." );
-			res = ToolRunner.run(conf, mr, args);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		System.exit(res);
-	}		
+            LOG.info("starting ...");
+            res = ToolRunner.run(mr, args);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.exit(res);
+    }       
 
-    /**
-     * Prints a usage message for the CLIWrapper.
-     */
-    public static void printUsage() {
-        System.out.println("usage: CLIWrapper -i inFile [-o outFile] [-t mapred.job.reuse.jvm.num.tasks] [-n num lines of inFile per task]");
-        System.out.println("    execution of ToolSpec: [-r toolspec repository on hdfs]");
-        System.out.println("    execution of Taverna workflow: -w workflow [-v tavernaDir]");
-    }
-		
 }
