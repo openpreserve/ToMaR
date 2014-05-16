@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
@@ -42,8 +43,9 @@ public class ToolRepository implements Repository {
     /**
      * Constructs the repository from a given HDFSystem and a directory path.
      */
-    public ToolRepository( FileSystem fs, Path directory ) 
-            throws FileNotFoundException, IOException {
+    public ToolRepository( FileSystem fs, Path directory ) throws IOException {
+    	System.out.println("fs.workingdir: "+fs.getWorkingDirectory());
+    	System.out.println("fs.directory: " + directory);
         if( !fs.exists(directory) )
             throw new FileNotFoundException(directory.toString());
 
@@ -59,6 +61,7 @@ public class ToolRepository implements Repository {
      * 
      * @param strTool name of the tool to get
      */
+    @Override
     public Tool getTool( String strTool ) throws IOException {
         Path file = new Path( 
                 repo_dir.toString() + System.getProperty("file.separator") 
@@ -97,8 +100,9 @@ public class ToolRepository implements Repository {
      * Unmarshals an input stream of xml data to a Tool.
      */
     private Tool fromInputStream(InputStream input) throws JAXBException {
-		Unmarshaller u = jc.createUnmarshaller();
-		return (Tool) u.unmarshal(new StreamSource(input));
+        Unmarshaller u = jc.createUnmarshaller();
+        JAXBElement<Tool> unmarshalled = u.unmarshal(new StreamSource(input), Tool.class);
+        return unmarshalled.getValue();
     }
 
 }

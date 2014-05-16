@@ -6,6 +6,8 @@ import eu.scape_project.pt.tool.Output;
 import eu.scape_project.pt.tool.Parameter;
 import eu.scape_project.pt.tool.Tool;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -48,6 +50,8 @@ abstract public class ToolProcessor extends Processor {
      * Other Parameters. 
      */
     protected Map<String, String> mapOtherParameters;
+
+    protected File workingDir = null;
 
     /**
      * Constructs the processor with a tool of a Toolspec
@@ -200,5 +204,12 @@ abstract public class ToolProcessor extends Processor {
      */
     protected String placeholderToParameter( String strVariable ) {
         return strVariable.substring(2, strVariable.length() - 1 );
+    }
+
+    public void setWorkingDir(String workingDir) throws IOException {
+        File dir = new File(workingDir);
+        if( !dir.exists() ) dir.mkdirs();
+        else if( !dir.isDirectory() ) throw new IOException("Working directory " + dir + " is not a directory");
+        this.workingDir = dir;
     }
 }

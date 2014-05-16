@@ -31,9 +31,9 @@ public class CmdLineToolProcessor extends ToolProcessor {
     public CmdLineToolProcessor(Tool tool, Operation operation) {
         super(tool, operation);
         debugToken = 'C';
-	}
+    }
 
-	/**
+    /**
      * Executes the tool, optionally reading from a previous process (stdin).
      * All input file parameters need to be local to the machine.
      */
@@ -51,11 +51,18 @@ public class CmdLineToolProcessor extends ToolProcessor {
         }
 
         String strCmd = replaceAll(this.operation.getCommand(), allInputs);
-        LOG.debug("strCmd = " + strCmd );
+        LOG.info("executing " + strCmd );
 
-        String[] cmd = {"sh", "-c", strCmd};
-
-        proc = Runtime.getRuntime().exec(cmd);
+        String[] cmd;
+        if( System.getProperty("os.name").startsWith("Windows")){
+            cmd = new String[]{"cmd.exe", "/C", strCmd};
+        } else {
+            cmd = new String[]{"sh", "-c", strCmd};
+        }
+        ProcessBuilder pb = new ProcessBuilder(cmd);
+        pb.redirectErrorStream(true);
+        pb.directory(this.workingDir);
+        proc = pb.start();//Runtime.getRuntime().exec(cmd, null, this.workingDir);
 
         this.setStdIn(proc.getOutputStream());
         this.setStdOut(proc.getInputStream());

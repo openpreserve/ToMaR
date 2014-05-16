@@ -5,15 +5,14 @@ import eu.scape_project.pt.tool.Tool;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Mock-up repository to use in unit-testing on the local filesystem.
@@ -22,7 +21,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class LocalToolRepository implements Repository {
     
-	private static Log LOG = LogFactory.getLog(ToolRepository.class);
 	private static JAXBContext jc;
 	
 	static {
@@ -49,17 +47,17 @@ public class LocalToolRepository implements Repository {
     /**
      * Gets Tool from the repository.
      */
-    public Tool getTool(String toolName ) throws FileNotFoundException {
-        File fileTool = new File( this.toolsDir.getPath() + 
+    @Override
+    public Tool getTool(String toolName ) throws IOException {
+        File file = new File( this.toolsDir.getPath() + 
                 System.getProperty("file.separator") + toolName + ".xml");
 
-        FileInputStream fis = new FileInputStream(fileTool);
+        FileInputStream fis = new FileInputStream(file);
         try {
             return fromInputStream( fis );
         } catch (JAXBException ex) {
-            LOG.error(ex);
+            throw new IOException(ex);
         }
-        return null;
     }
 
     @Override
@@ -71,8 +69,9 @@ public class LocalToolRepository implements Repository {
      * Unmarshals an input stream of xml data to a Tool.
      */
     private Tool fromInputStream(InputStream input) throws JAXBException {
-		Unmarshaller u = jc.createUnmarshaller();
-		return (Tool) u.unmarshal(new StreamSource(input));
+        Unmarshaller u = jc.createUnmarshaller();
+        JAXBElement<Tool> unmarshalled = u.unmarshal(new StreamSource(input), Tool.class);
+        return unmarshalled.getValue();
     }
 
 }

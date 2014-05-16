@@ -9,11 +9,14 @@ target/
 .classpath
 .project
 .settings/
+workbench.xmi
 
 # Mac OS X
 .DS_Store
 
-# vi
-.session.vim
+# VI
 .*.swp
+.*.vim
 
+# Logger
+*.log

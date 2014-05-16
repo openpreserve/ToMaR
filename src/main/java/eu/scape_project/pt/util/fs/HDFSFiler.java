@@ -97,10 +97,10 @@ public class HDFSFiler extends Filer {
     }
 
     @Override
-    public void setDirectory(String strDir ) {
+    public void setWorkingDir(String strDir ) {
         LOG.debug("setDirectory " + strDir );
-        File dir = new File(strDir);
-        if( !dir.isAbsolute() ) {
+        File dirFile = new File(strDir);
+        if( !dirFile.isAbsolute() ) {
             this.dir = this.getTmpDir() + strDir;
         } else {
             this.dir = strDir;
@@ -137,7 +137,6 @@ public class HDFSFiler extends Filer {
      * Returns working space directory with user defined directories.
      */
     private String getFullDirectory() {
-        String sep = System.getProperty("file.separator");
         String par = this.getPath();
         return (this.dir.isEmpty() 
                 ? "hdfsfiler_" + file.hashCode()
