@@ -60,7 +60,7 @@ public class JavaToolProcessorTest extends Configured {
         Map<String, String> mapInput = new HashMap<String, String>();
         mapInput.put("say", "Hello" );
 
-        processor.setInputFileParameters( mapInput );
+        processor.setParameters( mapInput );
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         processor.next( new StreamProcessor(baos));
         try {

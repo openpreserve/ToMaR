@@ -12,9 +12,9 @@
       <description>Greets world</description>
       <command>/usr/bin/java eu.scape_project.pt.proc.HelloWorld ${say}</command>
       <inputs>
-        <input name="say" required="true">
+        <parameter name="say" required="true">
           <description>The greeting</description>
-        </input>
+        </parameter>
       </inputs>
     </operation>
   </operations>
