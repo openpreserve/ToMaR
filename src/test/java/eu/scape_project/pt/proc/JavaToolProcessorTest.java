@@ -30,7 +30,7 @@ import org.apache.hadoop.conf.Configured;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.scape_project.pt.proc.HelloWorld;
+import static org.junit.Assert.assertEquals;
 
 public class JavaToolProcessorTest extends Configured {
     private static final Log LOG = LogFactory
@@ -70,7 +70,7 @@ public class JavaToolProcessorTest extends Configured {
                 "Exception during execution (maybe unresolved system dependency?): ",
                     ex);
         }
-        LOG.info("output: " + new String(baos.toByteArray()) );
+        assertEquals("Hello World!\n", new String(baos.toByteArray() ));
     }
 
 

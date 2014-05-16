@@ -1,9 +1,10 @@
 package eu.scape_project.pt.proc;
 
-import eu.scape_project.pt.tool.Operation;
-import eu.scape_project.pt.tool.Tool;
-
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +18,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import eu.scape_project.pt.tool.Operation;
+import eu.scape_project.pt.tool.Tool;
 
 /**
  * Creates processes for a Java Tool.
@@ -87,18 +91,21 @@ public class JavaToolProcessor extends ToolProcessor {
 
         String[] args = parseCmdLineArgs(strCmd);
 
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream localOut = new PrintStream(baos);
+        PrintStream stdout = System.out;
+        InputStream stdin = System.in;
+        System.setOut(localOut);
+
+        ByteArrayOutputStream bufferIn = new ByteArrayOutputStream();
+        this.setStdIn(bufferIn);
+
+        this.run(); // running in the same thread, buffer output of previous processor
+        
+        System.setIn(new ByteArrayInputStream(bufferIn.toByteArray()));
         securityManager(true);
-        this.setStdIn(System.out);
-        this.setStdOut(System.in);
-
-        new Thread(this).start();
-
-        int retval = 0;
-        if( this.next != null )
-            retval = this.next.execute();
 
         try {
-            //TODO needs to execute async
             this.theClass.getMethod("main", String[].class).invoke(null, (Object)args);
         } catch (ExitException ee) {
             LOG.debug("Application tried to exit VM", ee);
@@ -107,6 +114,15 @@ public class JavaToolProcessor extends ToolProcessor {
             throw e;
         }
         securityManager(false);
+
+        this.setStdOut(new ByteArrayInputStream(baos.toByteArray()));
+        System.setIn(stdin);
+        System.setOut(stdout);
+
+        int retval = 0;
+        if( this.next != null )
+            retval = this.next.execute();
+
 
         return retval;
     }
