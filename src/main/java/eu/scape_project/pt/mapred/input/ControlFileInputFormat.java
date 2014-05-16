@@ -46,6 +46,7 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.LineRecordReader;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.hadoop.mapreduce.lib.input.NLineInputFormat;
 import org.apache.hadoop.util.LineReader;
 
 import eu.scape_project.pt.tool.Operation;
@@ -62,16 +63,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * NLineInputFormat which splits N lines of input as one split.
+ * ControlFileInputFormat for a control file with references to files on HDFS.
  *
- * In many "pleasantly" parallel applications, each process/mapper
- * processes the same input file (s), but with computations are
- * controlled by different parameters.(Referred to as "parameter sweeps").
- * One way to achieve this, is to specify a set of parameters
- * (one set per line) as input in a control file
- * (which is the input path to the map-reduce application,
- * where as the input dataset is specified
- * via a config variable in JobConf.).
+ * Each line of a control file contains descriptions of toolspec/operation invocations
+ * with additional references to files on HDFS. For instance, given a toolspec
+ * "hash" with the operation "md5" a control line might look like this:
+ *
+ * hash md5 --input="hdfs://path/to/file"
+ *
+ * Hadoop's NLineInputFormat would split the control file so that each map task
+ * get N such lines. However, as for data locality it is important that the line gets
+ * processed by a node which actually hosts the referenced input file. As 
+ * NLineInputFormat is agnostic of the input file reference it will spill the map task
+ * to any node arbitrarily. 
+ *
+ * ControlFileInputFormat extends NLineInputformat
  *
  * The NLineInputFormat can be used in such applications, that splits
  * the input file such that by default, one line is fed as
@@ -81,7 +87,7 @@ import org.apache.commons.logging.LogFactory;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Stable
-public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> {
+public class ControlFileInputFormat extends NLineInputFormat {
     private static Log LOG = LogFactory.getLog(ControlFileInputFormat.class);
     public static final String LINES_PER_MAP = "mapreduce.input.lineinputformat.linespermap";
 
@@ -93,10 +99,11 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
     }
 
     /**
-     * Logically splits the set of input files for the job, splits N lines
-     * of the input as one split.
+     * Rearranges the lines of the control files according to the location
+     * the input file references and logically splits the rearranged control file 
+     * into splits of about N lines.
      *
-     * @see FileInputFormat#getSplits(JobContext)
+     * @see NLineInputFormat#getSplits(JobContext)
      */
     public List<InputSplit> getSplits(JobContext job) throws IOException {
         List<InputSplit> splits = new ArrayList<InputSplit>();
@@ -352,24 +359,6 @@ public class ControlFileInputFormat extends FileInputFormat<LongWritable, Text> 
         });
         return hosts.toArray(new String[0]);
 
-    }
-
-    /**
-     * Set the number of lines per split
-     * @param job the job to modify
-     * @param numLines the number of lines per split
-     */
-    public static void setNumLinesPerSplit(Job job, int numLines) {
-        job.getConfiguration().setInt(LINES_PER_MAP, numLines);
-    }
-
-    /**
-     * Get the number of lines per split
-     * @param job the job
-     * @return the number of lines per split
-     */
-    public static int getNumLinesPerSplit(JobContext job) {
-        return job.getConfiguration().getInt(LINES_PER_MAP, 1);
     }
 }
 
