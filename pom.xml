@@ -15,7 +15,7 @@
 		<pig.version>0.12.0</pig.version>
 	</properties>
 	
-	<version>1.5.2-SNAPSHOT</version>
+	<version>1.5.2-java-support</version>
     
 	<build>
 		<plugins>

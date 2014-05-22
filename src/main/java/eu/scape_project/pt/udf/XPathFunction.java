@@ -1,22 +1,17 @@
 package eu.scape_project.pt.udf;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 import org.apache.pig.EvalFunc;
 import org.apache.pig.data.DataBag;
 import org.apache.pig.data.DefaultDataBag;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.data.TupleFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
+
+import eu.scape_project.pt.util.SimpleXPath;
 
 /**
  * 
@@ -25,52 +20,44 @@ import org.xml.sax.InputSource;
  */
 public class XPathFunction extends EvalFunc<DataBag> {
 
-	TupleFactory tupleFactory = TupleFactory.getInstance();
+    TupleFactory tupleFactory = TupleFactory.getInstance();
 
-	@Override
-	public DataBag exec(Tuple input) throws IOException {
+    @Override
+    public DataBag exec(Tuple input) throws IOException {
 
-		if (input == null) {
-			return null;
-		}
+        if (input == null) {
+            return null;
+        }
 
-		if (input.size() != 2) {
-			throw new IllegalArgumentException(
-					"Tuple needs to contain only two arguments");
-		}
+        if (input.size() != 2) {
+            throw new IllegalArgumentException(
+                    "Tuple needs to contain only two arguments");
+        }
 
-		String expression = (String) input.get(0);
-		Tuple xml_tuple = (Tuple) input.get(1);
-		String xml = (String) xml_tuple.get(0);
-		
-		try {
+        String expression = (String) input.get(0);
+        Tuple xml_tuple = (Tuple) input.get(1);
+        String xml = (String) xml_tuple.get(0);
+        
+        DataBag dataBag = new DefaultDataBag();
+        try {
 
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			InputSource is = new InputSource(new StringReader(xml.toString()));
+            String[] result = SimpleXPath.parse(expression, new ByteArrayInputStream(xml.getBytes()));
 
-			Document xmlDocument = builder.parse(is);
 
-			XPath xPath = XPathFactory.newInstance().newXPath();
+            for ( String res : result ) {
+                Tuple tuple = tupleFactory.newTuple(res);
+                dataBag.add(tuple);
+            }
 
-			NodeList nodeList = (NodeList) xPath.compile(expression).evaluate(
-					xmlDocument, XPathConstants.NODESET);
 
-			DataBag dataBag = new DefaultDataBag();
+        } catch (Exception e) {
+            StringWriter writer = new StringWriter();
+            e.printStackTrace(new PrintWriter(writer));
+            Tuple tuple = tupleFactory.newTuple(writer.toString());
+            dataBag.add(tuple);
+        }         
+        return dataBag;
 
-			for (int i = 0; i < nodeList.getLength(); i++) {
-				Tuple tuple = tupleFactory.newTuple(nodeList.item(i)
-						.getFirstChild().getNodeValue());
-				dataBag.add(tuple);
-			}
-
-			return dataBag;
-
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
-		}
-
-	}
+    }
 
 }

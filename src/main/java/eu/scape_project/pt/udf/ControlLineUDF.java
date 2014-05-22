@@ -1,12 +1,14 @@
 package eu.scape_project.pt.udf;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.pig.EvalFunc;
 import org.apache.pig.data.Tuple;
 import org.apache.pig.data.TupleFactory;
 import org.apache.pig.impl.util.UDFContext;
-import org.apache.hadoop.conf.Configuration;
 
 import eu.scape_project.pt.ToolWrapper;
 import eu.scape_project.pt.util.PropertyNames;
@@ -46,7 +48,9 @@ public class ControlLineUDF extends EvalFunc<Tuple> {
 			return tuple;
 			
 		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
+            StringWriter writer = new StringWriter();
+            e.printStackTrace(new PrintWriter(writer));
+            return tupleFactory.newTuple(writer.toString());
 		}
 
 	}		
