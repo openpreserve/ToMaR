@@ -6,26 +6,27 @@
 //
 
 
-package eu.scape_project.pt.tool;
+package eu.scape_project.tool.toolwrapper.data.tool_spec;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
 
 
 /**
- * <p>Java class for Property complex type.
+ * <p>Java class for InOutAttrs complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="Property">
+ * &lt;complexType name="InOutAttrs">
  *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" />
- *     &lt;/restriction>
+ *     &lt;extension base="{http://scape-project.eu/tool}InOut">
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
@@ -33,39 +34,20 @@ import javax.xml.bind.annotation.XmlValue;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Property", propOrder = {
-    "content"
+@XmlType(name = "InOutAttrs")
+@XmlSeeAlso({
+    Input.class,
+    Output.class,
+    Parameter.class
 })
-public class Property {
+public class InOutAttrs
+    extends InOut
+{
 
-    @XmlValue
-    protected String content;
-    @XmlAttribute
+    @XmlAttribute(required = true)
     protected String name;
-
-    /**
-     * Gets the value of the content property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getContent() {
-        return content;
-    }
-
-    /**
-     * Sets the value of the content property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setContent(String value) {
-        this.content = value;
-    }
+    @XmlAttribute
+    protected Boolean required;
 
     /**
      * Gets the value of the name property.
@@ -89,6 +71,30 @@ public class Property {
      */
     public void setName(String value) {
         this.name = value;
+    }
+
+    /**
+     * Gets the value of the required property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isRequired() {
+        return required;
+    }
+
+    /**
+     * Sets the value of the required property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setRequired(Boolean value) {
+        this.required = value;
     }
 
 }

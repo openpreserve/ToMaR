@@ -6,4 +6,4 @@
 //
 
 @javax.xml.bind.annotation.XmlSchema(namespace = "http://scape-project.eu/tool", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
-package eu.scape_project.pt.tool;
+package eu.scape_project.tool.toolwrapper.data.tool_spec;

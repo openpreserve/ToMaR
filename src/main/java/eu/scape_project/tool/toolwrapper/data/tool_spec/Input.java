@@ -6,24 +6,25 @@
 //
 
 
-package eu.scape_project.pt.tool;
+package eu.scape_project.tool.toolwrapper.data.tool_spec;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for Stdin complex type.
+ * <p>Java class for Input complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="Stdin">
+ * &lt;complexType name="Input">
  *   &lt;complexContent>
- *     &lt;extension base="{http://scape-project.eu/tool}InOut">
- *       &lt;attribute name="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *     &lt;extension base="{http://scape-project.eu/tool}InOutAttrs">
+ *       &lt;sequence>
+ *         &lt;element name="defaultValue" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -32,36 +33,37 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Stdin")
-public class Stdin
-    extends InOut
+@XmlType(name = "Input", propOrder = {
+    "defaultValue"
+})
+public class Input
+    extends InOutAttrs
 {
 
-    @XmlAttribute
-    protected Boolean required;
+    protected String defaultValue;
 
     /**
-     * Gets the value of the required property.
+     * Gets the value of the defaultValue property.
      * 
      * @return
      *     possible object is
-     *     {@link Boolean }
+     *     {@link String }
      *     
      */
-    public Boolean isRequired() {
-        return required;
+    public String getDefaultValue() {
+        return defaultValue;
     }
 
     /**
-     * Sets the value of the required property.
+     * Sets the value of the defaultValue property.
      * 
      * @param value
      *     allowed object is
-     *     {@link Boolean }
+     *     {@link String }
      *     
      */
-    public void setRequired(Boolean value) {
-        this.required = value;
+    public void setDefaultValue(String value) {
+        this.defaultValue = value;
     }
 
 }

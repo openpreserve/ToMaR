@@ -11,11 +11,12 @@
 	<artifactId>tomar</artifactId>
 	<name>SCAPE Tool-to-MapReduce Wrapper</name>
 	<description>Invokes SCAPE preservation tools on Hadoop MapReduce environments</description>
+	<version>1.5.2-SNAPSHOT</version>
+
 	<properties>
+        <scape-toolspec.version>2.0.0</scape-toolspec.version>
 		<pig.version>0.12.0</pig.version>
 	</properties>
-	
-	<version>1.5.2-SNAPSHOT</version>
     
 	<build>
 		<plugins>
@@ -54,11 +55,21 @@
 	</build>
     
 	<dependencies>
+        <!-- 
+		<dependency>
+            <groupId>eu.scape-project.tool</groupId>
+            <artifactId>toolwrapper-data</artifactId>
+            <version>${scape-toolspec.version}</version>
+		</dependency>
+        -->
+
 		<dependency>
 			<groupId>net.sf.jopt-simple</groupId>
 			<artifactId>jopt-simple</artifactId>
 			<version>4.0-beta1</version>
 		</dependency>
+
+        <!-- environment -->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
@@ -72,18 +83,19 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.pig</groupId>
 			<artifactId>pig</artifactId>
 			<version>${pig.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
+        <!-- test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
     
 	<!-- for snapshot builds when building with travis -->

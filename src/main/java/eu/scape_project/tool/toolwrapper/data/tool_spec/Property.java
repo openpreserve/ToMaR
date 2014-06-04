@@ -6,7 +6,7 @@
 //
 
 
-package eu.scape_project.pt.tool;
+package eu.scape_project.tool.toolwrapper.data.tool_spec;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -16,16 +16,15 @@ import javax.xml.bind.annotation.XmlValue;
 
 
 /**
- * <p>Java class for Format complex type.
+ * <p>Java class for Property complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="Format">
+ * &lt;complexType name="Property">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="registryName" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="version" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -34,17 +33,15 @@ import javax.xml.bind.annotation.XmlValue;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Format", propOrder = {
+@XmlType(name = "Property", propOrder = {
     "content"
 })
-public class Format {
+public class Property {
 
     @XmlValue
     protected String content;
-    @XmlAttribute(required = true)
-    protected String registryName;
     @XmlAttribute
-    protected String version;
+    protected String name;
 
     /**
      * Gets the value of the content property.
@@ -71,51 +68,27 @@ public class Format {
     }
 
     /**
-     * Gets the value of the registryName property.
+     * Gets the value of the name property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getRegistryName() {
-        return registryName;
+    public String getName() {
+        return name;
     }
 
     /**
-     * Sets the value of the registryName property.
+     * Sets the value of the name property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setRegistryName(String value) {
-        this.registryName = value;
-    }
-
-    /**
-     * Gets the value of the version property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getVersion() {
-        return version;
-    }
-
-    /**
-     * Sets the value of the version property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setVersion(String value) {
-        this.version = value;
+    public void setName(String value) {
+        this.name = value;
     }
 
 }

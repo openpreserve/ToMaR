@@ -6,25 +6,23 @@
 //
 
 
-package eu.scape_project.pt.tool;
+package eu.scape_project.tool.toolwrapper.data.tool_spec;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for InOutAttrs complex type.
+ * <p>Java class for Stdin complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="InOutAttrs">
+ * &lt;complexType name="Stdin">
  *   &lt;complexContent>
  *     &lt;extension base="{http://scape-project.eu/tool}InOut">
- *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/extension>
  *   &lt;/complexContent>
@@ -34,44 +32,13 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "InOutAttrs")
-@XmlSeeAlso({
-    Input.class,
-    Output.class,
-    Parameter.class
-})
-public class InOutAttrs
+@XmlType(name = "Stdin")
+public class Stdin
     extends InOut
 {
 
-    @XmlAttribute(required = true)
-    protected String name;
     @XmlAttribute
     protected Boolean required;
-
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
-    }
 
     /**
      * Gets the value of the required property.

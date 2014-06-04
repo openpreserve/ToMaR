@@ -19,13 +19,13 @@ import eu.scape_project.pt.proc.StreamProcessor;
 import eu.scape_project.pt.proc.ToolProcessor;
 import eu.scape_project.pt.repo.Repository;
 import eu.scape_project.pt.repo.ToolRepository;
-import eu.scape_project.pt.tool.Operation;
-import eu.scape_project.pt.tool.Tool;
 import eu.scape_project.pt.util.CmdLineParser;
 import eu.scape_project.pt.util.Command;
 import eu.scape_project.pt.util.PipedArgsParser;
 import eu.scape_project.pt.util.PropertyNames;
 import eu.scape_project.pt.util.fs.Filer;
+import eu.scape_project.tool.toolwrapper.data.tool_spec.Operation;
+import eu.scape_project.tool.toolwrapper.data.tool_spec.Tool;
 
 
 public class ToolWrapper {

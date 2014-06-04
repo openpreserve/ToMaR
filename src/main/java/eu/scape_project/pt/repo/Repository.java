@@ -1,6 +1,6 @@
 package eu.scape_project.pt.repo;
 
-import eu.scape_project.pt.tool.Tool;
+import eu.scape_project.tool.toolwrapper.data.tool_spec.Tool;
 
 import java.io.IOException;
 

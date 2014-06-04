@@ -1,11 +1,11 @@
 package eu.scape_project.pt.proc;
 
-import eu.scape_project.pt.tool.Input;
-import eu.scape_project.pt.tool.Operation;
-import eu.scape_project.pt.tool.Operations;
-import eu.scape_project.pt.tool.Output;
-import eu.scape_project.pt.tool.Parameter;
-import eu.scape_project.pt.tool.Tool;
+import eu.scape_project.tool.toolwrapper.data.tool_spec.Input;
+import eu.scape_project.tool.toolwrapper.data.tool_spec.Operation;
+import eu.scape_project.tool.toolwrapper.data.tool_spec.Operations;
+import eu.scape_project.tool.toolwrapper.data.tool_spec.Output;
+import eu.scape_project.tool.toolwrapper.data.tool_spec.Parameter;
+import eu.scape_project.tool.toolwrapper.data.tool_spec.Tool;
 
 import java.io.File;
 import java.io.IOException;
