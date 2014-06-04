@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<tool xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://scape-project.eu/tool tool-1.0_draft.xsd" xmlns="http://scape-project.eu/tool" xmlns:xlink="http://www.w3.org/1999/xlink" schemaVersion="1.0">
+<tool xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://scape-project.eu/tool https://raw.githubusercontent.com/openplanets/scape-toolspecs/master/schemas/tool-1.0_draft.xsd" 
+    xmlns="http://scape-project.eu/tool" xmlns:xlink="http://www.w3.org/1999/xlink" schemaVersion="1.0" name="image_to_j2k" version="1.5.0">
   <operations>
     <operation name="image-to-j2k">
       <description>Migrates an image to jpeg2000</description>
