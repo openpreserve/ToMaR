@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<tool xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-    xsi:schemaLocation="http://scape-project.eu/tool https://raw.githubusercontent.com/openplanets/scape-toolspecs/master/schemas/tool-1.0_draft.xsd"
-    xmlns="http://scape-project.eu/tool" xmlns:xlink="http://www.w3.org/1999/xlink" schemaVersion="1.0" name="tar" version="1.0.1">
+<tool xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://scape-project.eu/tool https://raw.githubusercontent.com/openplanets/scape-toolwrapper/master/toolwrapper-data/src/main/resources/tool-1.1_draft.xsd"
+    xmlns="http://scape-project.eu/tool" xmlns:xlink="http://www.w3.org/1999/xlink" schemaVersion="1.1" name="tar" version="1.0.1">
+    <license name="APSL-2.0">Apache License, Version 2.0</license>
     <operations>
         <operation name="tar">
             <description>Tars one file or folder</description>

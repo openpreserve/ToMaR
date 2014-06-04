@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <tool xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://scape-project.eu/tool https://raw.githubusercontent.com/openplanets/scape-toolspecs/master/schemas/tool-1.0_draft.xsd"
-    xmlns="http://scape-project.eu/tool" xmlns:xlink="http://www.w3.org/1999/xlink" schemaVersion="1.0" name="file" version="1.0.1"
+    xsi:schemaLocation="http://scape-project.eu/tool https://raw.githubusercontent.com/openplanets/scape-toolwrapper/master/toolwrapper-data/src/main/resources/tool-1.1_draft.xsd"
+    xmlns="http://scape-project.eu/tool" xmlns:xlink="http://www.w3.org/1999/xlink" schemaVersion="1.1" name="file" version="1.0.1"
     homepage="http://bla.org/">
-    <installation>
-        <dependency operatingSystemName="Debian">file</dependency>
-        <license type="Apache Licence 2.0">Apache License, Version 2.0</license>
-    </installation>
-    <otherProperties>
-        <property name="cost">0</property>
-    </otherProperties>
+    <license name="APSL-2.0">Apache License, Version 2.0</license>
     <operations>
         <operation name="identify">
             <description>Identifies a files mime-type</description>

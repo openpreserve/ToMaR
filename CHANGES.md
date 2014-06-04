@@ -11,6 +11,7 @@
   * Add UDF for Pig scripts.
   * Decouple ToolWrapper from ToolspecMapper so that the core functionality for ToMaR can be called outside of the Mapper.
   * Standard error stream of the local process is redirected to its standard output stream. In case of an non-zero exit status of the process the output of the process is thrown.
+  * update to toolspec 1.1 schema and reuse from toolwrapper-data, drop duplicated (and possibly outdated) toolspec JAXB classes
   
 ## 1.5.0
 

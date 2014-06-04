@@ -1,18 +1,16 @@
 package eu.scape_project.pt.repo;
 
 import eu.scape_project.tool.toolwrapper.data.tool_spec.Tool;
+import eu.scape_project.tool.toolwrapper.data.tool_spec.utils.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
+
+import org.xml.sax.SAXException;
 
 /**
  * Mock-up repository to use in unit-testing on the local filesystem.
@@ -21,16 +19,6 @@ import javax.xml.transform.stream.StreamSource;
  */
 public class LocalToolRepository implements Repository {
     
-	private static JAXBContext jc;
-	
-	static {
-		try {
-			jc  = JAXBContext.newInstance(Tool.class);
-		} catch (JAXBException e) {
-            throw new ExceptionInInitializerError(e);
-		}
-	}
-
     private final File toolsDir;
 
     /**
@@ -54,8 +42,10 @@ public class LocalToolRepository implements Repository {
 
         final FileInputStream fis = new FileInputStream(file);
         try {
-            return fromInputStream( fis );
+            return Utils.fromInputStream( fis );
         } catch (JAXBException ex) {
+            throw new IOException(ex);
+        } catch (SAXException ex) {
             throw new IOException(ex);
         } finally {
             fis.close();
@@ -67,13 +57,4 @@ public class LocalToolRepository implements Repository {
         return this.toolsDir.list();
     }
     
-    /**
-     * Unmarshals an input stream of xml data to a Tool.
-     */
-    private Tool fromInputStream(InputStream input) throws JAXBException {
-        Unmarshaller u = jc.createUnmarshaller();
-        JAXBElement<Tool> unmarshalled = u.unmarshal(new StreamSource(input), Tool.class);
-        return unmarshalled.getValue();
-    }
-
 }

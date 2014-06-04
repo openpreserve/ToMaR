@@ -1,16 +1,12 @@
 package eu.scape_project.pt.repo;
 
 import eu.scape_project.tool.toolwrapper.data.tool_spec.Tool;
+import eu.scape_project.tool.toolwrapper.data.tool_spec.utils.Utils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,6 +14,7 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.xml.sax.SAXException;
 
 /**
  * Manages toolspecs for a given HDFS directory.
@@ -27,15 +24,6 @@ import org.apache.hadoop.fs.Path;
 public class ToolRepository implements Repository {
 
 	private static Log LOG = LogFactory.getLog(ToolRepository.class);
-	private static JAXBContext jc;
-	
-	static {
-		try {
-			jc  = JAXBContext.newInstance(Tool.class);
-		} catch (JAXBException e) {
-		    throw new ExceptionInInitializerError(e);
-		}
-	}
 
     private final Path repo_dir;
     private final FileSystem fs;
@@ -69,8 +57,10 @@ public class ToolRepository implements Repository {
 
         FSDataInputStream fis = fs.open( file );
         try {
-            return fromInputStream( fis );
+            return Utils.fromInputStream( fis );
         } catch (JAXBException ex) {
+            throw new IOException(ex);
+        } catch (SAXException ex) {
             throw new IOException(ex);
         }
     }
@@ -94,15 +84,6 @@ public class ToolRepository implements Repository {
      */
     private String getToolName( String strTool ) {
         return strTool + ".xml";
-    }
-
-    /**
-     * Unmarshals an input stream of xml data to a Tool.
-     */
-    private Tool fromInputStream(InputStream input) throws JAXBException {
-        Unmarshaller u = jc.createUnmarshaller();
-        JAXBElement<Tool> unmarshalled = u.unmarshal(new StreamSource(input), Tool.class);
-        return unmarshalled.getValue();
     }
 
 }
