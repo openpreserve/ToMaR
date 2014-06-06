@@ -52,11 +52,13 @@ public class LocalToolRepository implements Repository {
         File file = new File( this.toolsDir.getPath() + 
                 System.getProperty("file.separator") + toolName + ".xml");
 
-        FileInputStream fis = new FileInputStream(file);
+        final FileInputStream fis = new FileInputStream(file);
         try {
             return fromInputStream( fis );
         } catch (JAXBException ex) {
             throw new IOException(ex);
+        } finally {
+            fis.close();
         }
     }
 

@@ -1,12 +1,6 @@
 package eu.scape_project.pt.mapred;
 
-import eu.scape_project.pt.repo.Repository;
-import eu.scape_project.pt.repo.ToolRepository;
 import eu.scape_project.pt.util.PropertyNames;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -16,21 +10,14 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.util.GenericOptionsParser;
 import org.apache.hadoop.util.ToolRunner;
-import org.apache.hadoop.mapreduce.lib.input.NLineInputFormat;
 
 /**
  * A command-line interaction wrapper to execute cmd-line tools with MapReduce.
@@ -43,6 +30,7 @@ public class CLIWrapper extends Configured implements org.apache.hadoop.util.Too
 
     private static Log LOG = LogFactory.getLog(CLIWrapper.class);
 
+    @SuppressWarnings("static-access") // OptionBuilder uses the pattern of calling the static methods on instances, leave as is
     private Options buildOptions() {
         Options options = new Options();
         Option oH = OptionBuilder
@@ -171,7 +159,7 @@ public class CLIWrapper extends Configured implements org.apache.hadoop.util.Too
     /**
      * CLIWrapper user interface. See printUsage for further information.
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         
         int res = 1;
         CLIWrapper mr = new CLIWrapper();

@@ -108,9 +108,10 @@ public class ToolProcessorTest extends Configured {
             LOG.error(
                 "Exception during execution (maybe unresolved system dependency?): ",
                     ex);
+        } finally {
+            fin.close();
         }
         LOG.info("output: " + new String(baos.toByteArray()) );
-
     }
 
     @Test
@@ -181,6 +182,9 @@ public class ToolProcessorTest extends Configured {
             LOG.error(
                 "Exception during execution (maybe unresolved system dependency?): ",
                     ex);
+        } finally {
+            fin.close();
+            fout.close();
         }
     }
 
