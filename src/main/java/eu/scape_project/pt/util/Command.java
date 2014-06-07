@@ -52,6 +52,12 @@ public class Command {
     
     @Override
     public boolean equals( Object oo ) {
+        if (oo == this) {
+            return true;
+        }
+        if (oo == null || oo.getClass() != getClass()) {
+            return false;
+        }
         Command o = (Command)oo;
         return this.tool.equals(o.tool) && this.action.equals(o.action)
                 && this.pairs.equals(o.pairs);

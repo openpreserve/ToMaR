@@ -19,8 +19,9 @@ import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
-import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +32,8 @@ import org.apache.commons.logging.LogFactory;
  * @author Matthias Rella, DME-AIT
  */
 public class PipedArgsParser implements CmdLineParser {
+
+    private static final int BLANK = 32;
 
     private static Log LOG = LogFactory.getLog(PipedArgsParser.class);
 
@@ -123,7 +126,7 @@ public class PipedArgsParser implements CmdLineParser {
     static class Varbox {
         String stdin = "";
         String stdout = "";
-        Vector<Command> commands = new Vector<Command>();
+        List<Command> commands = new ArrayList<Command>();
     }
 
     /**
@@ -238,7 +241,7 @@ public class PipedArgsParser implements CmdLineParser {
 
         if (nextToken() != '-')
             throw new IOException("unrecognized token "
-                + (tokenizer.ttype >= 32 ? (char)tokenizer.ttype : ""));
+                + (tokenizer.ttype >= BLANK ? (char)tokenizer.ttype : ""));
 
         if (nextToken() != StreamTokenizer.TT_WORD) 
             throw new IOException("unrecognized token, expecting key word");

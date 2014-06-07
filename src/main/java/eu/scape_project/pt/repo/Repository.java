@@ -13,8 +13,8 @@ public interface Repository {
      * The toolspecs contained in the repository.
      * @return a string array of toolspecs
      */
-    public String[] getToolList();
+    String[] getToolList();
 
-    public Tool getTool(String tool) throws IOException;
+    Tool getTool(String tool) throws IOException;
 
 }

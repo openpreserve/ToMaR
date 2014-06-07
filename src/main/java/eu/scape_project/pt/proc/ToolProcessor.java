@@ -105,8 +105,8 @@ public class ToolProcessor extends Processor {
         allInputs.putAll(getOutputFileParameters());
         allInputs.putAll(getOtherParameters());
 
-        for (String key : allInputs.keySet()) {
-            LOG.debug("Key: " + key + " = " + allInputs.get(key));
+        for (Map.Entry<String, String> entry : allInputs.entrySet()) {
+            LOG.debug("Key: " + entry.getKey() + " = " + entry.getValue());
         }
 
         String strCmd = replaceAll(this.operation.getCommand(), allInputs);
@@ -121,7 +121,7 @@ public class ToolProcessor extends Processor {
         ProcessBuilder pb = new ProcessBuilder(cmd);
         pb.redirectErrorStream(true);
         pb.directory(this.workingDir);
-        proc = pb.start();//Runtime.getRuntime().exec(cmd, null, this.workingDir);
+        proc = pb.start();
 
         this.setStdIn(proc.getOutputStream());
         this.setStdOut(proc.getInputStream());
@@ -237,14 +237,14 @@ public class ToolProcessor extends Processor {
      private String replaceAll(String strCmd, Map<String,String> mapInputs) {
          if( mapInputs.isEmpty() ) return strCmd;
         // create the pattern wrapping the keys with ${} and join them with '|'
-        String regexp = "";
+        StringBuilder regexp = new StringBuilder();
         for( String input : mapInputs.keySet())
-            regexp += parameterToPlaceholder(input);
-        regexp = regexp.substring(0, regexp.length()-1);
+            regexp.append(parameterToPlaceholder(input));
+        regexp.setLength(regexp.length() - 1);
 
         LOG.debug("replaceAll.regexp = " + regexp );
         StringBuffer sb = new StringBuffer();
-        Pattern p = Pattern.compile(regexp);
+        Pattern p = Pattern.compile(regexp.toString());
         Matcher m = p.matcher(strCmd);
 
         while (m.find())
@@ -276,7 +276,9 @@ public class ToolProcessor extends Processor {
 
     public void setWorkingDir(String workingDir) throws IOException {
         File dir = new File(workingDir);
-        if( !dir.exists() ) dir.mkdirs();
+        if( !dir.exists() ) 
+            if ( !dir.mkdirs() ) 
+                throw new IOException("Could not creare working directory " + dir);
         else if( !dir.isDirectory() ) throw new IOException("Working directory " + dir + " is not a directory");
         this.workingDir = dir;
     }

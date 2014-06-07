@@ -116,7 +116,9 @@ public class ToolWrapper {
                 firstProcessor = lastProcessor;
             else {
                 Processor help = firstProcessor;  
-                while(help.next() != null ) help = help.next();
+                while ( help.next() != null ) {
+                    help = help.next();
+                }
                 help.next(lastProcessor);
             }
         }
@@ -137,40 +139,40 @@ public class ToolWrapper {
         String text = convertToResult(oStdout, strStdoutFile);
 
         if (retVal != 0)
-            throw new RuntimeException(text.toString());
+            throw new RuntimeException(text);
 
         delocalizeOutputParameters(mapOutputFileParameters);
 
         return text;
     }
 
-    static private String localiseFileRefs(String localFile) throws IOException {
+    private static String localiseFileRefs(String localFile) throws IOException {
         String[] remoteFileRefs = localFile.split(SEP);
-        String localFileRefs = "";
+        StringBuilder localFileRefs = new StringBuilder();
         String workingDir = workingDir();
         for( int i = 0; i < remoteFileRefs.length; i++ ){
             Filer filer = Filer.create(remoteFileRefs[i]);
             filer.setWorkingDir(workingDir);
             filer.localize();
-            localFileRefs = localFileRefs + SEP + filer.getRelativeFileRef();
+            localFileRefs.append(localFileRefs + SEP + filer.getRelativeFileRef());
         }
-        return localFileRefs;
+        return localFileRefs.toString();
     }
 
-    static private String convertToResult(OutputStream oStdout, final String strStdoutFile) {
+    private static String convertToResult(OutputStream oStdout, final String strStdoutFile) {
         if( oStdout instanceof ByteArrayOutputStream )
             return  new String( ((ByteArrayOutputStream)oStdout).toByteArray() );
         return strStdoutFile;
     }
 
-    static private OutputStream createStdOut(final String strStdoutFile) throws IOException {
+    private static OutputStream createStdOut(final String strStdoutFile) throws IOException {
         if( strStdoutFile != null ) 
             return Filer.create(strStdoutFile).getOutputStream();
         // default: output to bytestream
         return new ByteArrayOutputStream();
     }
 
-    static private StreamProcessor createStreamProcessorIn(final String strStdinFile) throws IOException {
+    private static StreamProcessor createStreamProcessorIn(final String strStdinFile) throws IOException {
         if( strStdinFile != null ) {
             InputStream iStdin = Filer.create(strStdinFile).getInputStream();
             return new StreamProcessor(iStdin);
@@ -178,14 +180,14 @@ public class ToolWrapper {
         return null;
     }
 
-    static private void delocalizeOutputParameters(Map<String, String>[] mapOutputFileParameters) throws IOException {
+    private static void delocalizeOutputParameters(Map<String, String>[] mapOutputFileParameters) throws IOException {
         for(int i = 0; i < mapOutputFileParameters.length; i++ ) {
             Map<String, String> outputFileParameters = mapOutputFileParameters[i];
             delocalizeOutputParameters(outputFileParameters);
         }
     }
 
-    static private void delocalizeOutputParameters(Map<String, String> outputFileParameters) throws IOException {
+    private static void delocalizeOutputParameters(Map<String, String> outputFileParameters) throws IOException {
         String workingDir = workingDir();
         for( String strFile : outputFileParameters.values())
         {
@@ -198,7 +200,7 @@ public class ToolWrapper {
         }
     }
 
-    static private String workingDir() {
+    private static String workingDir() {
         return System.getProperty("user.dir");
     }
 

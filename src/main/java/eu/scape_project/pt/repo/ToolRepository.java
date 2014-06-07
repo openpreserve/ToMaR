@@ -81,7 +81,7 @@ public class ToolRepository implements Repository {
         try {
             list = fs.listStatus(repo_dir);
         } catch (IOException ex) {
-            LOG.error(ex);
+            LOG.error("", ex);
         }
         String strList[] = new String[list.length];
         for( int f = 0; f < list.length; f++ )

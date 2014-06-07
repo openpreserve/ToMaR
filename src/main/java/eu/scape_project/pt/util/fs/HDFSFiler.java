@@ -84,7 +84,9 @@ public class HDFSFiler extends Filer {
     public void localize() throws IOException {
         File fileRef = new File(getAbsoluteFileRef());
         LOG.debug("localize " + fileRef);
-        new File(fileRef.getParent()).mkdirs();
+        if (!new File(fileRef.getParent()).mkdirs()) {
+            throw new IOException("Could not create local directory: " + fileRef.getParent() );
+        }
         Path localfile = new Path( fileRef.toString() );
         if(hdfs.exists(file)) {
             hdfs.copyToLocalFile(file, localfile);

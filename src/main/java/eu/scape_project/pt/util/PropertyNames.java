@@ -19,4 +19,7 @@ public class PropertyNames {
     // nInputFormat
     public static final String LINES_PER_MAP = "mapreduce.input.lineinputformat.linespermap";
 
+    private PropertyNames() {
+    }
+    
 }

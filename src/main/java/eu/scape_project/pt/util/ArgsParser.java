@@ -33,6 +33,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ArgsParser implements CmdLineParser {
 
+    private static final int BLANK = 32;
+
     private static Log LOG = LogFactory.getLog(ArgsParser.class);
 
     private final String tool;
@@ -144,7 +146,7 @@ public class ArgsParser implements CmdLineParser {
                 LOG.error("unrecognized token, expecting '='");
         }
         LOG.error("unrecognized token "
-                + (tokenizer.ttype >= 32 ? (char)tokenizer.ttype : ""));
+                + (tokenizer.ttype >= BLANK ? (char)tokenizer.ttype : ""));
 
     }
 

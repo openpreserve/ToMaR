@@ -40,15 +40,15 @@ public class XPathFunction extends EvalFunc<DataBag> {
 		}
 
 		String expression = (String) input.get(0);
-		Tuple xml_tuple = (Tuple) input.get(1);
-		String xml = (String) xml_tuple.get(0);
+		Tuple xmlTuple = (Tuple) input.get(1);
+		String xml = (String) xmlTuple.get(0);
 		
 		try {
 
 			DocumentBuilderFactory factory = DocumentBuilderFactory
 					.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			InputSource is = new InputSource(new StringReader(xml.toString()));
+			InputSource is = new InputSource(new StringReader(xml));
 
 			Document xmlDocument = builder.parse(is);
 

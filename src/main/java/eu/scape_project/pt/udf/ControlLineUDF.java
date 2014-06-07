@@ -42,12 +42,10 @@ public class ControlLineUDF extends EvalFunc<Tuple> {
             toolWrapper.setup(conf);
 			String stdOut = toolWrapper.wrap(ctrlLine);
 			//System.out.println("ToolWrapper.wrap returns: "+stdOut);
-			Tuple tuple = tupleFactory.newTuple(stdOut);
-			return tuple;
+			return tupleFactory.newTuple(stdOut);
 			
 		} catch (Exception e) {
 			throw new IllegalArgumentException(e);
 		}
-
 	}		
 }
