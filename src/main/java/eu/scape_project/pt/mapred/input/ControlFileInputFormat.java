@@ -18,6 +18,7 @@
 
 package eu.scape_project.pt.mapred.input;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -314,23 +315,44 @@ public class ControlFileInputFormat extends NLineInputFormat {
         proc.setParameters(command.getPairs());
         Map<String, String> mapInputFileParameters = proc
                 .getInputFileParameters();
-        Path[] inFiles;
-        int i = 0;
+        ArrayList<Path> inFiles = new ArrayList<Path>();
         if (strStdinFile != null) {
-            inFiles = new Path[mapInputFileParameters.size() + 1];
             Path p = new Path(strStdinFile);
             if (fs.exists(p)) {
-                inFiles[i++] = p;
+                inFiles.add(p);
             }
-        } else {
-            inFiles = new Path[mapInputFileParameters.size()];
-        }
+        } 
 
-        // TODO traverse directories
         for (String fileRef : mapInputFileParameters.values()) {
             Path p = new Path(fileRef);
-            if (fs.exists(p)) {
-                inFiles[i++] = p;
+            if (fs.exists(p) ) { 
+                if( fs.isDirectory(p) ) {
+                    inFiles.addAll(getFilesInDir(fs, p));
+                } else {
+                    inFiles.add(p);
+                }
+            }
+        }
+        return inFiles.toArray(new Path[0]);
+    }
+
+    /**
+     * Recursively collects paths in a directory.
+     *
+     * @param fs Hadoop filesystem handle
+     * @param path path, a directory
+     * @return list of paths
+     * @throws IOException
+     * @throws FileNotFoundException
+     */
+    private static List<Path> getFilesInDir(FileSystem fs, Path path)
+            throws FileNotFoundException, IOException {
+        ArrayList<Path> inFiles = new ArrayList<Path>();
+        for( FileStatus s : fs.listStatus(path) ) {
+            if( s.isDirectory() ) {
+                inFiles.addAll(getFilesInDir(fs, s.getPath()));
+            } else {
+                inFiles.add(s.getPath());
             }
         }
         return inFiles;

@@ -91,14 +91,18 @@ public class HDFSFiler extends Filer {
         if(hdfs.exists(file)) {
             if( LOG.isDebugEnabled() ) {
                 FileStatus fs = hdfs.getFileStatus(file);
-                BlockLocation[] locations = hdfs.getFileBlockLocations(fs, (long)0, fs.getLen());
-                for( BlockLocation location : locations ) {
-                    LOG.debug("location hosts: ");
-                    String[] hosts = location.getHosts();
-                    LOG.debug("  one blockLocation on: ");
-                    for( String host : hosts ) {
-                        LOG.debug("    host = " + host);
+                if( !fs.isDirectory() ) {
+                    BlockLocation[] locations = hdfs.getFileBlockLocations(fs, (long)0, fs.getLen());
+                    for( BlockLocation location : locations ) {
+                        LOG.debug("location hosts: ");
+                        String[] hosts = location.getHosts();
+                        LOG.debug("  one blockLocation on: ");
+                        for( String host : hosts ) {
+                            LOG.debug("    host = " + host);
+                        }
                     }
+                } else {
+                    LOG.debug("file is a directory");
                 }
             }
             hdfs.copyToLocalFile(file, localfile);
