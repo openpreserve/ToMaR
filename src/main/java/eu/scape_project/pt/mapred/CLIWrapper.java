@@ -134,7 +134,7 @@ public class CLIWrapper extends Configured implements org.apache.hadoop.util.Too
             conf.set(PropertyNames.OUTDIR, "out/"+System.nanoTime()%10000 );
         }
         if( conf.get(PropertyNames.INPUTFORMAT_CLASS ) == null ) {
-            conf.set(PropertyNames.INPUTFORMAT_CLASS, "org.apache.hadoop.mapreduce.lib.input.NLineInputFormat");
+            conf.set(PropertyNames.INPUTFORMAT_CLASS, "eu.scape_project.pt.mapred.input.ControlFileInputFormat");
         }
 
     }
