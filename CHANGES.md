@@ -1,3 +1,7 @@
+## 1.6.0
+
+  * Added ControlFileInputFormat as the default inputformat for control files. This inputformat reorders the input control file to make data-location-aware splits possible. That means that control lines are assigned to nodes where input file references are local.
+
 ## 1.5.2
   * Add UDF for Pig scripts.
   * Decouple ToolWrapper from ToolspecMapper so that the core functionality for ToMaR can be called outside of the Mapper.
