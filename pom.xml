@@ -15,7 +15,8 @@
 
 	<properties>
         <scape-toolspec.version>2.0.0</scape-toolspec.version>
-		<pig.version>0.12.0</pig.version>
+		<hadoop.version>2.0.0-cdh4.2.0</hadoop.version>
+		<pig.version>0.10.0-cdh4.2.0</pig.version>
 	</properties>
 
     <repositories>
@@ -92,13 +93,13 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-common</artifactId>
-            <version>2.0.0-cdh4.2.0</version>
+            <version>${hadoop.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
-            <version>2.0.0-cdh4.2.0</version>
+            <version>${hadoop.version}</version>
             <scope>provided</scope>
         </dependency>
         
