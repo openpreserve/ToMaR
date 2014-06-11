@@ -21,6 +21,14 @@
 
     <repositories>
         <repository>
+            <id>sonatypesnapshots</id>
+            <url>http://oss.sonatype.org/content/repositories/snapshots/</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
             <id>cloudera</id>
             <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
         </repository>
@@ -121,27 +129,6 @@
     
 	<!-- for snapshot builds when building with travis -->
 	<profiles>
-		<profile>
-			<id>travisbuild</id>
-			<activation>
-				<!-- active by default so we can get scape parent pom -->
-				<activeByDefault>true</activeByDefault>
-				<property>
-					<name>env.TRAVIS</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<repositories>
-				<repository>
-					<id>sonatypesnapshots</id>
-					<url>http://oss.sonatype.org/content/repositories/snapshots/</url>
-					<layout>default</layout>
-					<snapshots>
-						<enabled>true</enabled>
-					</snapshots>
-				</repository>
-			</repositories>
-		</profile>
 		<!-- For Maven site publication on OPF Jenkins server -->
 		<profile>
 			<id>opf-jenkins-site</id>
@@ -153,5 +140,47 @@
 				</site>
 			</distributionManagement>
 		</profile>
+        <profile>
+            <id>must-use-64bit-windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <!-- update versions so the provided DLLs work -->
+            <properties>
+                <hadoop.version>2.3.0-cdh5.0.0</hadoop.version>
+                <pig.version>0.12.0-cdh5.0.0</pig.version>
+            </properties>
+            <build>
+                <plugins>
+                    <!-- enforce 64bit Java so the provided DLLs work -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-os</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <!-- see http://stackoverflow.com/questions/2854882/maven-finding-out-whether-running-in-a-32-or-a-64-bit-jvm -->
+                                        <requireProperty>
+                                            <property>sun.arch.data.model</property>
+                                            <message>Only configured to use Oracle JDK under Windows!</message>
+                                            <regex>^64$</regex>
+                                            <regexMessage>The "os.arch" running Windows must be 64bit.</regexMessage>
+                                        </requireProperty>
+                                    </rules>
+                                    <fail>true</fail>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
 	</profiles>
 </project>
