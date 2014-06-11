@@ -4,8 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -61,13 +59,8 @@ public class MockupFileSystem extends FileSystem {
 
     private HashMap<String, MockupFile> mockupFiles = new HashMap<String, MockupFile>();
 
-    public MockupFileSystem() {
-    };
-
     @Override
-    public FSDataOutputStream append(Path arg0, int arg1, Progressable arg2)
-            throws IOException {
-        // TODO Auto-generated method stub
+    public FSDataOutputStream append(Path arg0, int arg1, Progressable arg2) {
         return null;
     }
 
@@ -93,43 +86,37 @@ public class MockupFileSystem extends FileSystem {
     }
 
     @Override
-    public boolean delete(Path arg0) throws IOException {
-        // TODO Auto-generated method stub
+    public boolean delete(Path arg0) {
         return false;
     }
 
     @Override
-    public boolean delete(Path arg0, boolean arg1) throws IOException {
-        // TODO Auto-generated method stub
+    public boolean delete(Path arg0, boolean arg1) {
         return false;
     }
 
     @Override
-    public FileStatus getFileStatus(Path arg0) throws IOException {
+    public FileStatus getFileStatus(Path arg0) {
         return new FileStatus(0, false, 0, 0, 0, arg0);
     }
 
     @Override
     public URI getUri() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Path getWorkingDirectory() {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public FileStatus[] listStatus(Path arg0) throws IOException {
-        // TODO Auto-generated method stub
+    public FileStatus[] listStatus(Path arg0) {
         return null;
     }
 
     @Override
-    public boolean mkdirs(Path arg0, FsPermission arg1) throws IOException {
-        // TODO Auto-generated method stub
+    public boolean mkdirs(Path arg0, FsPermission arg1) {
         return false;
     }
 
@@ -161,28 +148,25 @@ public class MockupFileSystem extends FileSystem {
     }
 
     @Override
-    public boolean rename(Path arg0, Path arg1) throws IOException {
-        // TODO Auto-generated method stub
+    public boolean rename(Path arg0, Path arg1) {
         return false;
     }
 
     @Override
     public void setWorkingDirectory(Path arg0) {
-        // TODO Auto-generated method stub
 
     }
 
-    public void addFile(String filename, boolean exists,
-            BlockLocation[] locations) {
+    public void addFile(String filename, boolean exists, BlockLocation[] locations) {
         LOG.debug("addFile " + filename);
         mockupFiles.put(filename, new MockupFile(filename, exists, locations));
     }
 
-    public BlockLocation[] getFileBlockLocations(FileStatus status, long start,
-            long end) {
+    public BlockLocation[] getFileBlockLocations(FileStatus status, long start, long end) {
         return mockupFiles.get(status.getPath().toString()).getLocations();
     }
 
+    @Override
     public boolean exists(Path file) {
         return mockupFiles.containsKey(file.toString()) && mockupFiles.get(file.toString()).exists();
     }

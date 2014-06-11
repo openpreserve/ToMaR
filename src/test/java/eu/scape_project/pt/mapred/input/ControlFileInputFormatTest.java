@@ -15,11 +15,10 @@
  */
 package eu.scape_project.pt.mapred.input;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,11 +28,8 @@ import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileStatus;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.junit.Before;
@@ -55,7 +51,7 @@ public class ControlFileInputFormatTest {
     }
     
     @Test
-    public void testGetInputFiles() throws Exception {
+    public void testGetInputFiles() throws IOException {
         MockupFileSystem fs = new MockupFileSystem();
 
         String inputFile = "inputFile";
@@ -63,22 +59,21 @@ public class ControlFileInputFormatTest {
         String line = "\""+inputFile+"\" > foo bar-stdin";
         Path inFiles[] = ControlFileInputFormat.getInputFiles(fs, new PipedArgsParser(), repo, line);
 
-        assertEquals(new Path[]{new Path(inputFile)}, inFiles );
+        assertArrayEquals(new Path[]{new Path(inputFile)}, inFiles );
 
         line = "foo bar --input=\""+inputFile+"\"";
         inFiles = ControlFileInputFormat.getInputFiles(fs, new PipedArgsParser(), repo, line);
 
-        assertEquals(new Path[]{new Path(inputFile)}, inFiles );
+        assertArrayEquals(new Path[]{new Path(inputFile)}, inFiles );
 
         line = "\""+inputFile+"\" > foo bar --input=\""+inputFile+"\"";
         inFiles = ControlFileInputFormat.getInputFiles(fs, new PipedArgsParser(), repo, line);
 
-        assertEquals(new Path[]{new Path(inputFile), new Path(inputFile)}, inFiles );
-
+        assertArrayEquals(new Path[]{new Path(inputFile), new Path(inputFile)}, inFiles );
     }
 
     @Test
-    public void testGetSortedHosts() throws Exception {
+    public void testGetSortedHosts() throws IOException {
         MockupFileSystem fs = new MockupFileSystem();
         Path pInputFile1 = new Path("inputFile1");
         Path pInputFile2 = new Path("inputFile2");
@@ -104,16 +99,15 @@ public class ControlFileInputFormatTest {
             LOG.debug(i++ + ". Host = " + host);
         }
 
-        assertEquals(new String[]{
+        assertArrayEquals(new String[]{
             "hostA",
             "hostB",
             "hostC"
         }, hosts );
-
     }
 
     @Test
-    public void testAddToLocationMap() throws Exception {
+    public void testAddToLocationMap() {
         Map<String, ArrayList<String>> locationMap = new HashMap<String, ArrayList<String>>();
         String[] hosts = {"hostA", "hostB", "hostC"};
 
@@ -152,7 +146,7 @@ public class ControlFileInputFormatTest {
     }
 
     @Test
-    public void testWriteNewControlFileAndCreateSplits() throws Exception {
+    public void testWriteNewControlFileAndCreateSplits() throws IOException {
         MockupFileSystem fs = new MockupFileSystem();
         Path newControlFile = new Path("newControlFile");
         fs.addFile("newControlFile", true, null);
@@ -197,81 +191,83 @@ public class ControlFileInputFormatTest {
                 newControlFile, fs, locationMap, 3);
 
         FSDataInputStream bis = fs.open(newControlFile);
-        int i = 0;
-        for( FileSplit split : splits ) {
-            LOG.debug(++i + ".split = " + split.toString());
-            byte[] content = new byte[(int)split.getLength()];
-            bis.read((int)split.getStart(), content, 0, (int)split.getLength());
-            String cont = new String(content);
-            LOG.debug("  content = " + new String(content));
-            if( cont.startsWith("line1-1") ) {
-                String expected = "";
-                for( String line : locationMap.get("host1") ) {
-                    expected += line + "\n";
+        try {
+            int i = 0;
+            for( FileSplit split : splits ) {
+                LOG.debug(++i + ".split = " + split.toString());
+                byte[] content = new byte[(int)split.getLength()];
+                bis.read((int)split.getStart(), content, 0, (int)split.getLength());
+                String cont = new String(content);
+                LOG.debug("  content = " + new String(content));
+                if( cont.startsWith("line1-1") ) {
+                    String expected = "";
+                    for( String line : locationMap.get("host1") ) {
+                        expected += line + "\n";
+                    }
+                    assertEquals(expected, cont);
+                } else if( cont.startsWith("line2-1") ) {
+                    String expected = "";
+                    int j = 0;
+                    for( String line : locationMap.get("host2") ) {
+                        expected += line + "\n";
+                        if( ++j == 3 ) break;
+                    }
+                    assertEquals(expected, cont);
+                } else if( cont.startsWith("line2-4") ) {
+                    String expected = "";
+                    int j = 0;
+                    for( String line : locationMap.get("host2") ) {
+                        if( ++j <= 3 ) continue;
+                        expected += line + "\n";
+                    }
+                    assertEquals(expected, cont);
+                } else if( cont.startsWith("line3-1") ) {
+                    String expected = "";
+                    int j = 0;
+                    for( String line : locationMap.get("host3") ) {
+                        expected += line + "\n";
+                        if( ++j == 4 ) break;
+                    }
+                    assertEquals(expected, cont);
+                } else if( cont.startsWith("line3-5") ) {
+                    String expected = "";
+                    int j = 0;
+                    for( String line : locationMap.get("host3") ) {
+                        if( ++j <= 4 ) continue;
+                        expected += line + "\n";
+                    }
+                    assertEquals(expected, cont);
+                } else if( cont.startsWith("line4-1") ) {
+                    String expected = "";
+                    int j = 0;
+                    for( String line : locationMap.get("host4") ) {
+                        expected += line + "\n";
+                        if( ++j == 3 ) break;
+                    }
+                    assertEquals(expected, cont);
+                } else if( cont.startsWith("line4-4") ) {
+                    String expected = "";
+                    int j = 0;
+                    for( String line : locationMap.get("host4") ) {
+                        if( ++j <= 3 ) continue;
+                        expected += line + "\n";
+                        if( ++j > 7  ) break;
+                    }
+                    assertEquals(expected, cont);
+                } else if( cont.startsWith("line4-7") ) {
+                    String expected = "";
+                    int j = 0;
+                    for( String line : locationMap.get("host4") ) {
+                        if( ++j <= 6 ) continue;
+                        expected += line + "\n";
+                    }
+                    assertEquals(expected, cont);
+                } else {
+                    fail("wrong split");
                 }
-                assertEquals(expected, cont);
-            } else if( cont.startsWith("line2-1") ) {
-                String expected = "";
-                int j = 0;
-                for( String line : locationMap.get("host2") ) {
-                    expected += line + "\n";
-                    if( ++j == 3 ) break;
-                }
-                assertEquals(expected, cont);
-            } else if( cont.startsWith("line2-4") ) {
-                String expected = "";
-                int j = 0;
-                for( String line : locationMap.get("host2") ) {
-                    if( ++j <= 3 ) continue;
-                    expected += line + "\n";
-                }
-                assertEquals(expected, cont);
-            } else if( cont.startsWith("line3-1") ) {
-                String expected = "";
-                int j = 0;
-                for( String line : locationMap.get("host3") ) {
-                    expected += line + "\n";
-                    if( ++j == 4 ) break;
-                }
-                assertEquals(expected, cont);
-            } else if( cont.startsWith("line3-5") ) {
-                String expected = "";
-                int j = 0;
-                for( String line : locationMap.get("host3") ) {
-                    if( ++j <= 4 ) continue;
-                    expected += line + "\n";
-                }
-                assertEquals(expected, cont);
-            } else if( cont.startsWith("line4-1") ) {
-                String expected = "";
-                int j = 0;
-                for( String line : locationMap.get("host4") ) {
-                    expected += line + "\n";
-                    if( ++j == 3 ) break;
-                }
-                assertEquals(expected, cont);
-            } else if( cont.startsWith("line4-4") ) {
-                String expected = "";
-                int j = 0;
-                for( String line : locationMap.get("host4") ) {
-                    if( ++j <= 3 ) continue;
-                    expected += line + "\n";
-                    if( ++j > 7  ) break;
-                }
-                assertEquals(expected, cont);
-            } else if( cont.startsWith("line4-7") ) {
-                String expected = "";
-                int j = 0;
-                for( String line : locationMap.get("host4") ) {
-                    if( ++j <= 6 ) continue;
-                    expected += line + "\n";
-                }
-                assertEquals(expected, cont);
-            } else {
-                fail("wrong split");
             }
+        } finally {
+            bis.close();
         }
-
-
     }
 }
