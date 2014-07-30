@@ -89,6 +89,7 @@ public class ControlFileInputFormat extends NLineInputFormat {
      * 
      * @see NLineInputFormat#getSplits(JobContext)
      */
+    @Override
     public List<InputSplit> getSplits(JobContext job)
         throws IOException {
         List<InputSplit> splits = new ArrayList<InputSplit>();
@@ -106,11 +107,6 @@ public class ControlFileInputFormat extends NLineInputFormat {
      * Rearranges the lines of a control file according to the location
      * the input file references and logically splits the rearranged control file
      * into splits of about N lines.
-     * @param status
-     * @param conf
-     * @param numLinesPerSplit
-     * @return
-     * @throws IOException
      */
     public static List<FileSplit> getSplitsForFile(FileStatus status,
             Configuration conf, int numLinesPerSplit) throws IOException {
@@ -120,28 +116,20 @@ public class ControlFileInputFormat extends NLineInputFormat {
             throw new IOException("Not a file: " + controlFile);
         }
         FileSystem fs = controlFile.getFileSystem(conf);
-        LineReader lr = null;
-        try {
-            CmdLineParser parser = new PipedArgsParser();
-            String strRepo = conf.get(PropertyNames.REPO_LOCATION);
-            Path fRepo = new Path(strRepo);
-            Repository repo = new ToolRepository(fs, fRepo);
+        CmdLineParser parser = new PipedArgsParser();
+        String strRepo = conf.get(PropertyNames.REPO_LOCATION);
+        Path fRepo = new Path(strRepo);
+        Repository repo = new ToolRepository(fs, fRepo);
 
-            LOG.info("Creating location-aware control file");
-            Map<String, ArrayList<String>> locationMap = createLocationMap(controlFile, conf, repo, parser);
+        LOG.info("Creating location-aware control file");
+        Map<String, ArrayList<String>> locationMap = createLocationMap(controlFile, conf, repo, parser);
 
-            Path newControlFile = new Path(controlFile + "-rearranged"
-                    + System.currentTimeMillis());
+        Path newControlFile = new Path(controlFile + "-rearranged"
+                + System.currentTimeMillis());
 
-            splits = writeNewControlFileAndCreateSplits(newControlFile, fs, locationMap,
-                    numLinesPerSplit);
-            LOG.info("Location-aware control file " + newControlFile.toString() + " created");
-
-        } finally {
-            if (lr != null) {
-                lr.close();
-            }
-        }
+        splits = writeNewControlFileAndCreateSplits(newControlFile, fs, locationMap,
+                numLinesPerSplit);
+        LOG.info("Location-aware control file " + newControlFile.toString() + " created");
         return splits;
     }
 
@@ -155,8 +143,6 @@ public class ControlFileInputFormat extends NLineInputFormat {
      * @param locationMap map of control line -> arraylist of locations
      * @param numLinesPerSplit approximate number of lines per split
      * @return list of splits
-     *
-     * @throws IOException
      */
     public static List<FileSplit> writeNewControlFileAndCreateSplits(
             Path newControlFile, FileSystem fs,
@@ -216,8 +202,6 @@ public class ControlFileInputFormat extends NLineInputFormat {
      * @param repo Toolspec repository
      * @param parser parser for the control lines
      * @return mapping
-     *
-     * @throws IOException
      */
     public static Map<String, ArrayList<String>> createLocationMap(
             Path controlFile, Configuration conf, Repository repo,
@@ -291,10 +275,7 @@ public class ControlFileInputFormat extends NLineInputFormat {
      * @param fs Hadoop filesystem handle
      * @param parser for parsing the control line
      * @param repo Toolspec repository
-     * @param controlLine 
      * @return array of paths to input file references
-     *
-     * @throws IOException
      */
     public static Path[] getInputFiles(FileSystem fs, CmdLineParser parser,
             Repository repo, String controlLine) throws IOException {
@@ -342,8 +323,6 @@ public class ControlFileInputFormat extends NLineInputFormat {
      * @param fs Hadoop filesystem handle
      * @param path path, a directory
      * @return list of paths
-     * @throws IOException
-     * @throws FileNotFoundException
      */
     private static List<Path> getFilesInDir(FileSystem fs, Path path)
             throws FileNotFoundException, IOException {
@@ -365,8 +344,6 @@ public class ControlFileInputFormat extends NLineInputFormat {
      * @param fs Hadoop filesystem handle
      * @param inFiles array of input files
      * @return sorted String array
-     *
-     * @throws IOException
      */
     public static String[] getSortedHosts(FileSystem fs, Path[] inFiles)
             throws IOException {
@@ -389,6 +366,7 @@ public class ControlFileInputFormat extends NLineInputFormat {
         List<String> hosts = new ArrayList<String>();
         hosts.addAll(hostMap.keySet());
         Collections.sort(hosts, new Comparator<String>() {
+            @Override
             public int compare(String host1, String host2) {
                 return hostMap.get(host2) - hostMap.get(host1);
             }

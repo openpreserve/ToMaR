@@ -24,14 +24,12 @@ public class MockupFileSystem extends FileSystem {
     private static final Log LOG = LogFactory.getLog(MockupFileSystem.class);
 
     class MockupFile {
-        private String filename;
         private boolean exists;
         private BlockLocation[] locations;
         private ByteArrayOutputStream out;
 
         public MockupFile(String filename, boolean exists,
                 BlockLocation[] locations) {
-            this.filename = filename;
             this.exists = exists;
             this.locations = locations;
         }
@@ -162,6 +160,7 @@ public class MockupFileSystem extends FileSystem {
         mockupFiles.put(filename, new MockupFile(filename, exists, locations));
     }
 
+    @Override
     public BlockLocation[] getFileBlockLocations(FileStatus status, long start, long end) {
         return mockupFiles.get(status.getPath().toString()).getLocations();
     }
