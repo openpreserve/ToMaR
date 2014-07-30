@@ -20,6 +20,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.util.Progressable;
 
+@SuppressWarnings("unused")
 public class MockupFileSystem extends FileSystem {
     private static final Log LOG = LogFactory.getLog(MockupFileSystem.class);
 

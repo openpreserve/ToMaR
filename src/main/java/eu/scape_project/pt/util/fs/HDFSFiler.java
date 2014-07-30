@@ -94,7 +94,7 @@ public class HDFSFiler extends Filer {
             if( LOG.isDebugEnabled() ) {
                 FileStatus fs = hdfs.getFileStatus(file);
                 if( !fs.isDirectory() ) {
-                    BlockLocation[] locations = hdfs.getFileBlockLocations(fs, (long)0, fs.getLen());
+                    BlockLocation[] locations = hdfs.getFileBlockLocations(fs, 0, fs.getLen());
                     for( BlockLocation location : locations ) {
                         LOG.debug("location hosts: ");
                         String[] hosts = location.getHosts();

@@ -350,7 +350,7 @@ public class ControlFileInputFormat extends NLineInputFormat {
         final Map<String, Integer> hostMap = new HashMap<String, Integer>();
         for( Path inFile : inFiles ) {
             FileStatus s = fs.getFileStatus(inFile);
-            BlockLocation[] locations = fs.getFileBlockLocations(s, (long)0, s.getLen());
+            BlockLocation[] locations = fs.getFileBlockLocations(s, 0, s.getLen());
             for( BlockLocation location : locations ) {
                 String[] hosts = location.getHosts();
                 for( String host : hosts ) {
