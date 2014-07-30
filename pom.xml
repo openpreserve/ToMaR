@@ -11,10 +11,12 @@
 	<artifactId>tomar</artifactId>
 	<name>SCAPE Tool-to-MapReduce Wrapper</name>
 	<description>Invokes SCAPE preservation tools on Hadoop MapReduce environments</description>
-	<version>1.6.1-SNAPSHOT</version>
+	<version>2.0.0-SNAPSHOT</version>
 
 	<properties>
+        <!-- version of toolspec.xsd schema to work with, scape-toolspec 2.0 uses schemas 1.1 -->
         <scape-toolspec.version>2.0.0-SNAPSHOT</scape-toolspec.version>
+        <!-- version of Hadoop infrastructure tools -->
 		<hadoop.version>2.0.0-cdh4.2.0</hadoop.version>
 		<pig.version>0.10.0-cdh4.2.0</pig.version>
 	</properties>
@@ -102,7 +104,6 @@
             <version>${hadoop.version}</version>
             <scope>provided</scope>
         </dependency>
-        
 		<dependency>
 			<groupId>org.apache.pig</groupId>
 			<artifactId>pig</artifactId>

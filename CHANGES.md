@@ -1,3 +1,8 @@
+## 2.0.0
+
+  * non compatible major change:
+  * update to toolspec 1.1 schema and reuse from toolwrapper-data, drop duplicated (and possibly outdated) toolspec JAXB classes
+
 ## 1.6.1
 
   * minor code changes/cleanups
@@ -5,7 +10,6 @@
 
 ## 1.6.0
 
-  * update to toolspec 1.1 schema and reuse from toolwrapper-data, drop duplicated (and possibly outdated) toolspec JAXB classes
   * Added ControlFileInputFormat as the default inputformat for control files. This inputformat reorders the input control file to make data-location-aware splits possible. That means that control lines are assigned to nodes where input file references are local.
 
 ## 1.5.2
