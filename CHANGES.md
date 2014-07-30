@@ -1,3 +1,8 @@
+## 1.6.1
+
+  * minor code changes/cleanups
+  * test also run under Windows
+
 ## 1.6.0
 
   * Added ControlFileInputFormat as the default inputformat for control files. This inputformat reorders the input control file to make data-location-aware splits possible. That means that control lines are assigned to nodes where input file references are local.
