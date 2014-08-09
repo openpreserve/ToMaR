@@ -22,6 +22,7 @@ import org.apache.commons.logging.LogFactory;
  * Creates processes for a Tool.
  *
  * @author Matthias Rella [my_rho]
+ * @author Alastair Duncan []
  */
 public class ToolProcessor extends Processor {
 
@@ -114,6 +115,7 @@ public class ToolProcessor extends Processor {
 
         String[] cmd;
         if( System.getProperty("os.name").startsWith("Windows")){
+            strCmd = strCmd.replace("/", "\\");
             cmd = new String[]{"cmd.exe", "/C", strCmd};
         } else {
             cmd = new String[]{"sh", "-c", strCmd};

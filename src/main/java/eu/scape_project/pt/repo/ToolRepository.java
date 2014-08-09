@@ -20,6 +20,7 @@ import org.xml.sax.SAXException;
  * Manages toolspecs for a given HDFS directory.
  * 
  * @author Matthias Rella [myrho]
+ * @author Alastair Duncan []
  */
 public class ToolRepository implements Repository {
 
@@ -32,14 +33,6 @@ public class ToolRepository implements Repository {
      * Constructs the repository from a given HDFSystem and a directory path.
      */
     public ToolRepository( FileSystem fs, Path directory ) throws IOException {
-    	System.out.println("fs.workingdir: "+fs.getWorkingDirectory());
-    	System.out.println("fs.directory: " + directory);
-        if( !fs.exists(directory) )
-            throw new FileNotFoundException(directory.toString());
-
-        if( !fs.getFileStatus(directory).isDir() )
-            throw new IOException( directory.toString() + "is not a directory");
-
         this.fs = fs;
         this.repo_dir = directory;
     }

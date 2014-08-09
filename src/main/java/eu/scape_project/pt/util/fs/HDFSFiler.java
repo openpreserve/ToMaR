@@ -12,15 +12,17 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 
 /**
- * Handles the transportation of files from the local filesystem to HDFS 
- * and vice-versa.
+ * Handles the transportation of files from the local filesystem to HDFS and
+ * vice-versa.
  * 
  * @author Rainer Schmidt [rschmidt13]
  * @author Matthias Rella [myrho]
  * @author Martin Schenck [schenck]
+ * @author Alastair Duncan []
  */
 public class HDFSFiler extends Filer {
     
@@ -79,7 +81,14 @@ public class HDFSFiler extends Filer {
         Path dest = new Path(strDest);
         
         LOG.debug("local file name is: "+src+" destination path is:" +dest);
-        hdfs.copyFromLocalFile(src, dest);
+        FileStatus[] files = hdfs.globStatus(src);
+        if (files != null) {
+            for (int i = 0; i < files.length; i++) {
+                hdfs.copyFromLocalFile(files[i].getPath(), dest);
+            }
+        }else{
+            hdfs.copyFromLocalFile(src, dest);
+        }
     }
 
     @Override
