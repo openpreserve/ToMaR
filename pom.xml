@@ -163,7 +163,7 @@
                                         <requireProperty>
                                             <property>sun.arch.data.model</property>
                                             <message>Only configured to use Oracle JDK under Windows!</message>
-                                            <regex>^64$</regex>
+                                            <regex>64$</regex>
                                             <regexMessage>The "os.arch" running Windows must be 64bit.</regexMessage>
                                         </requireProperty>
                                     </rules>
