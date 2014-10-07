@@ -1,6 +1,10 @@
 SCAPE Tool-to-MapReduce Wrapper (ToMaR)
-======================================
+====================================== 
 *Let your Preservation Tools Scale*
+
+About
+-----
+ToMaR supports the use of legacy applications in a MapReduce environment by providing third party tools as User Defined Functions. The application specifically addresses the need for processing large volumes of binary content using existing, content-specific applications. ToMaR provides a generic MapReduce wrapper that can be use with command-line and Java applications. It supports tools that read input based on local file pointers or stdin/stdout streams. ToMaR implements a custom InputFormat to take advantage of data locality and can be used both, as a MapReduce application or as part of an Apache PIG script. More <a href=http://www.scape-project.eu/wp-content/uploads/2014/08/SCAPE_D5.3_AIT_V1.0.pdf>documentation</a> can be found on the SCAPE project web site.   
 
 Installation and Use
 --------------------
