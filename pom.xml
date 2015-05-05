@@ -141,7 +141,7 @@
 				<site>
 					<id>opf.jenkins.local.site</id>
 					<name>OPF Projects Website</name>
-					<url>file:///var/www/projects/scape/${project.name}</url>
+					<url>file:///var/www/projects.opf-labs.org/scape/${project.name}</url>
 				</site>
 			</distributionManagement>
 		</profile>
