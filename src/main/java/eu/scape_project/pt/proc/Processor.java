@@ -10,6 +10,8 @@ import org.apache.commons.logging.LogFactory;
 public abstract class Processor implements Runnable {
 
     private static Log LOG = LogFactory.getLog(ToolProcessor.class);
+    public static int EXECUTION_TIMEOUT_MINUTES = 10;
+
     
     protected char debugToken = 'P';
     /**
@@ -136,12 +138,13 @@ public abstract class Processor implements Runnable {
      * @throws IOException if an I/O error occurs
      * @since Commons IO 1.3
      */
+    
     private static long copyLarge(InputStream input, OutputStream output)
             throws IOException {
         byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
         long count = 0;
-        int n = 0;
-        while (-1 != (n = input.read(buffer))) {
+        int n = 0;    	
+        while (-1 != (n = input.read(buffer))) {        	
             output.write(buffer, 0, n);
             count += n;
         }

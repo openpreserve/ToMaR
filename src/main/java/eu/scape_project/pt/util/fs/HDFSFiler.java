@@ -86,8 +86,28 @@ public class HDFSFiler extends Filer {
     public void localize() throws IOException {
         File fileRef = new File(getAbsoluteFileRef());
         LOG.debug("localize " + fileRef);
-        if (!new File(fileRef.getParent()).mkdirs()) {
-            throw new IOException("Could not create local directory: " + fileRef.getParent() );
+        if(fileRef.getParentFile().exists()) {
+        	LOG.debug("local dir already existing: "+fileRef.getParent());
+        }
+        if (!fileRef.getParentFile().exists() && !new File(fileRef.getParent()).mkdirs()) {
+            LOG.error("Could not create local directory: " + fileRef.getParent() );
+            LOG.error("java.io.tmpdir = "+System.getProperty("java.io.tmpdir"));
+            LOG.error("this.dir = "+this.dir);
+            LOG.error("hadoop.tmp.dir = "+System.getProperty("hadoop.tmp.dir"));
+            //throw new IOException("Could not create local directory: " + fileRef.getParent() );
+            LOG.error("retrying...");
+            fileRef = new File(getAbsoluteFileRef());
+            if (!new File(fileRef.getParent()).mkdirs()) {
+            	LOG.error("still no luck");
+            	throw new IOException("Could not create local directory: " + fileRef.getParent() );
+            } else {
+            	LOG.error("worked on second attempt");
+            }
+        } else {
+        	LOG.error("Was able to create local directory: " + fileRef.getParent());
+            LOG.error("java.io.tmpdir = "+System.getProperty("java.io.tmpdir"));
+            LOG.error("this.dir = "+this.dir);
+            LOG.error("hadoop.tmp.dir = "+System.getProperty("hadoop.tmp.dir"));
         }
         Path localfile = new Path( fileRef.toString() );
         if(hdfs.exists(file)) {

@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Creates processes for a Tool.
@@ -132,6 +133,7 @@ public class ToolProcessor extends Processor {
             return this.next.execute();
 
         return proc.waitFor();
+
     }
 
     /** 
@@ -141,7 +143,13 @@ public class ToolProcessor extends Processor {
     public int waitFor() throws InterruptedException {
         if( proc == null ) return 0;
         LOG.debug("waitFor");
-        return proc.waitFor();
+        //return proc.waitFor();
+        boolean procCompleted = proc.waitFor((new Long(EXECUTION_TIMEOUT_MINUTES)).longValue(), TimeUnit.MINUTES);
+        if(!procCompleted) {
+        	LOG.warn("Tool execution has reached timeout of "+ EXECUTION_TIMEOUT_MINUTES+" minutes. The process has been terminated!");
+        	return -1;
+        }
+        return 0;
     }
 
     @Override
