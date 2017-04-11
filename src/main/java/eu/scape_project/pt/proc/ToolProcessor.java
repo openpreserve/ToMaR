@@ -144,13 +144,48 @@ public class ToolProcessor extends Processor {
         if( proc == null ) return 0;
         LOG.debug("waitFor");
         //return proc.waitFor();
-        boolean procCompleted = proc.waitFor((new Long(EXECUTION_TIMEOUT_MINUTES)).longValue(), TimeUnit.MINUTES);
+        //java8 boolean procCompleted = proc.waitFor((new Long(EXECUTION_TIMEOUT_MINUTES)).longValue(), TimeUnit.MINUTES);
+        boolean procCompleted = waitFor((new Long(EXECUTION_TIMEOUT_MINUTES)).longValue(), TimeUnit.MINUTES);
         if(!procCompleted) {
         	LOG.warn("Tool execution has reached timeout of "+ EXECUTION_TIMEOUT_MINUTES+" minutes. The process has been terminated!");
         	return -1;
         }
         return 0;
     }
+    
+    
+    
+    /**
+     * Copied here for compliance with java 7
+     * 
+     * Causes the current thread to wait, if necessary, until the
+     * subprocess represented by this {@code Process} object has
+     * terminated, or the specified waiting time elapses.
+     */
+    public boolean waitFor(long timeout, TimeUnit unit)
+        throws InterruptedException
+    {
+        long startTime = System.nanoTime();
+        long rem = unit.toNanos(timeout);
+
+        do {
+            try {
+            	proc.exitValue();
+                return true;
+            } catch(IllegalThreadStateException ex) {
+                if (rem > 0)
+                    Thread.sleep(
+                        Math.min(TimeUnit.NANOSECONDS.toMillis(rem) + 1, 100));
+            }
+            rem = unit.toNanos(timeout) - (System.nanoTime() - startTime);
+        } while (rem > 0);
+        return false;
+    }
+    
+    
+    
+    
+    
 
     @Override
     public void initialize() {
