@@ -17,12 +17,12 @@
         <!-- version of toolspec.xsd schema to work with, scape-toolspec 2.0 uses schemas 1.1 -->
         <scape-toolspec.version>2.0.0-SNAPSHOT</scape-toolspec.version>
         <!-- version of Hadoop infrastructure tools -->
-		<hadoop.version>2.6.0-cdh5.10.0</hadoop.version>
-		<pig.version>0.12.0-cdh5.10.0</pig.version>
+		<hadoop.version>2.0.0-cdh4.2.0</hadoop.version>
+		<pig.version>0.10.0-cdh4.2.0</pig.version>
 	</properties>
 
     <repositories>
-    		    <repository>
+        <repository>
             <id>sonatypesnapshots</id>
             <url>http://oss.sonatype.org/content/repositories/snapshots/</url>
             <layout>default</layout>
@@ -77,7 +77,6 @@
             <groupId>eu.scape-project.tool</groupId>
             <artifactId>toolwrapper-data</artifactId>
             <version>${scape-toolspec.version}</version>
-            <scope>compile</scope>
             <exclusions>
                 <exclusion>
                     <groupId>log4j</groupId>
